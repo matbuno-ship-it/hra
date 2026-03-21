@@ -484,6 +484,8 @@ const STICKER_EMOJIS = [
 // ============================================================
 let totalScore = 0, roundIndex = 0, roundsData = [], currentRound = null;
 let answered = false, typedChars = [], targetWord = '', activeInput = null;
+let wrongRounds = []; // rounds answered incorrectly, to retry at end
+let retryMode = false; // true when replaying wrong answers
 const $ = id => document.getElementById(id);
 
 // ============================================================
@@ -729,6 +731,7 @@ function genCompare() {
 function setupInput(inputId, displayId) {
   const input = $(inputId); activeInput = input;
   input.value = ''; input.maxLength = targetWord.length;
+  let attempts = 0;
   input.oninput = () => {
     if (answered) return;
     typedChars = [...input.value.toUpperCase()].slice(0, targetWord.length);
@@ -736,7 +739,11 @@ function setupInput(inputId, displayId) {
     updateTypingDisplay(displayId, targetWord, typedChars);
     if (typedChars.length === targetWord.length) {
       if (typedChars.join('') === targetWord) { onCorrect(); input.blur(); }
-      else { onWrong(); setTimeout(() => { if(!answered){typedChars=[];input.value='';updateTypingDisplay(displayId,targetWord,typedChars);$('feedback').textContent='';$('feedback').className='feedback';input.focus();}},1200); }
+      else {
+        attempts++;
+        if (attempts >= 2) { onWrongFinal(); }
+        else { onWrongFeedback(); setTimeout(() => { if(!answered){typedChars=[];input.value='';updateTypingDisplay(displayId,targetWord,typedChars);$('feedback').textContent='';$('feedback').className='feedback';input.focus();}},1200); }
+      }
     }
   };
   input.focus();
@@ -759,6 +766,7 @@ document.addEventListener('click', e => { if (e.target.closest('.typing-wrap') &
 // ============================================================
 function startGame() {
   totalScore = 0; roundIndex = 0;
+  wrongRounds = []; retryMode = false;
   $('totalScore').textContent = '0';
   $('navScore').style.display = 'flex';
   roundsData = generateRounds();
@@ -769,8 +777,11 @@ function startGame() {
 function loadRound() {
   answered = false; typedChars = [];
   currentRound = roundsData[roundIndex];
-  $('progressFill').style.width = ((roundIndex / ROUNDS_PER_GAME) * 100) + '%';
-  $('progressText').textContent = `${roundIndex + 1} / ${ROUNDS_PER_GAME}`;
+  const total = roundsData.length;
+  $('progressFill').style.width = ((roundIndex / total) * 100) + '%';
+  $('progressText').textContent = retryMode
+    ? `Opakujem ${roundIndex - ROUNDS_PER_GAME + 1} / ${total - ROUNDS_PER_GAME}`
+    : `${roundIndex + 1} / ${ROUNDS_PER_GAME}`;
   ['pictureContent','mathContent','dictationContent','syllableContent','matchContent','tfContent','compareContent'].forEach(id => $(id).style.display = 'none');
   $('feedback').textContent = ''; $('feedback').className = 'feedback';
   $('nextBtn').style.display = 'none'; $('skipBtn').style.display = 'inline-block';
@@ -797,10 +808,17 @@ function loadMath() {
   $('gameInstruction').textContent = 'Vyber správne číslo.';
   $('mathDisplay').innerHTML = currentRound.data.display;
   $('mathContent').style.display = 'block';
+  let mathAttempts = 0;
   const c = $('mathOptions'); c.innerHTML = '';
   currentRound.data.options.forEach(opt => {
     const btn = document.createElement('button'); btn.className = 'math-opt-btn'; btn.textContent = opt;
-    btn.addEventListener('click', () => { playSound('click'); if(answered)return; if(opt===currentRound.data.answer){btn.classList.add('correct');onCorrect();}else{btn.classList.add('wrong');btn.disabled=true;onWrongFeedback();} });
+    btn.addEventListener('click', () => {
+      playSound('click'); if(answered)return;
+      if(opt===currentRound.data.answer){btn.classList.add('correct');onCorrect();}
+      else{ btn.classList.add('wrong');btn.disabled=true;mathAttempts++;
+        if(mathAttempts>=2) onWrongFinal(); else onWrongFeedback();
+      }
+    });
     c.appendChild(btn);
   });
 }
@@ -826,7 +844,7 @@ function loadSyllable() {
   $('sylTarget').textContent = '_'.repeat(d.word.length);
   $('syllableContent').style.display = 'block';
 
-  let built = [];
+  let built = [], sylErrors = 0;
   const extra = pick(SYLLABLE_WORDS.filter(w => w.word !== d.word), 1).flatMap(w => w.syllables.slice(0,1));
   const allSyls = shuffle([...d.syllables, ...extra]);
 
@@ -842,7 +860,9 @@ function loadSyllable() {
         if (built.length === d.syllables.length) onCorrect();
       } else {
         btn.classList.add('wrong-flash');
-        onWrongFeedback();
+        sylErrors++;
+        if (sylErrors >= 2) onWrongFinal();
+        else onWrongFeedback();
         setTimeout(() => btn.classList.remove('wrong-flash'), 500);
       }
     });
@@ -913,7 +933,7 @@ function loadTF() {
     btn.addEventListener('click', () => {
       playSound('click'); if (answered) return;
       if (opt.val === d.correct) { btn.classList.add('correct'); onCorrect(); }
-      else { btn.classList.add('wrong'); onWrongFeedback(); }
+      else { btn.classList.add('wrong'); onWrongFinal(); }
     });
     c.appendChild(btn);
   });
@@ -928,12 +948,15 @@ function loadCompare() {
   $('compareContent').style.display = 'block';
 
   const c = $('compareOptions'); c.innerHTML = '';
+  let cmpAttempts = 0;
   ['<', '=', '>'].forEach(sign => {
     const btn = document.createElement('button'); btn.className = 'compare-btn'; btn.textContent = sign;
     btn.addEventListener('click', () => {
       playSound('click'); if (answered) return;
       if (sign === d.answer) { btn.classList.add('correct'); onCorrect(); }
-      else { btn.classList.add('wrong'); btn.disabled = true; onWrongFeedback(); }
+      else { btn.classList.add('wrong'); btn.disabled = true; cmpAttempts++;
+        if (cmpAttempts >= 1) onWrongFinal(); else onWrongFeedback();
+      }
     });
     c.appendChild(btn);
   });
@@ -954,10 +977,31 @@ function onCorrect() {
   playSound('correct'); mascotReact('correct'); launchConfetti();
 }
 
-function onWrong() {
-  $('feedback').textContent = '\u{274C} Skús to znova!';
+function getCorrectAnswer() {
+  const r = currentRound;
+  if (r.type === 'math') return r.data.answer;
+  if (r.type === 'compare') return r.data.answer;
+  if (r.type === 'trueFalse') return r.data.correct ? '\u{2705} Áno' : '\u{274C} Nie';
+  if (r.type === 'syllable') return r.data.word;
+  if (r.type === 'match') return '';
+  return r.data.word || '';
+}
+
+function onWrongFinal() {
+  // Show correct answer and move on (no retry in same round)
+  answered = true;
+  if (activeInput) activeInput.blur();
+  $('skipBtn').style.display = 'none';
+  const answer = getCorrectAnswer();
+  if (answer) $('feedback').innerHTML = `\u{274C} Správna odpoveď: <strong>${answer}</strong>`;
+  else $('feedback').textContent = '\u{274C} Chybička!';
   $('feedback').className = 'feedback error';
+  $('nextBtn').style.display = 'inline-block';
   playSound('wrong'); mascotReact('wrong');
+  // Save this round for retry later (only once per round)
+  if (!currentRound._retried) {
+    wrongRounds.push(JSON.parse(JSON.stringify(currentRound)));
+  }
 }
 
 function onWrongFeedback() {
@@ -969,19 +1013,34 @@ function onWrongFeedback() {
 $('skipBtn').addEventListener('click', () => {
   answered = true; $('skipBtn').style.display = 'none';
   if (activeInput) activeInput.blur();
-  const answer = currentRound.type === 'math' ? currentRound.data.answer
-    : currentRound.type === 'compare' ? currentRound.data.answer
-    : currentRound.type === 'trueFalse' ? (currentRound.data.correct ? '\u{2705}' : '\u{274C}')
-    : currentRound.data.word || '';
-  $('feedback').innerHTML = `\u{1F4A1} Správna odpoveď: <strong>${answer}</strong>`;
+  const answer = getCorrectAnswer();
+  if (answer) $('feedback').innerHTML = `\u{1F4A1} Správna odpoveď: <strong>${answer}</strong>`;
+  else $('feedback').textContent = '\u{1F4A1} Preskočené';
   $('feedback').className = 'feedback error';
   $('nextBtn').style.display = 'inline-block';
+  // Save for retry
+  if (!currentRound._retried) {
+    wrongRounds.push(JSON.parse(JSON.stringify(currentRound)));
+  }
 });
 
 $('nextBtn').addEventListener('click', () => {
   roundIndex++;
-  if (roundIndex >= ROUNDS_PER_GAME) showResult();
-  else { loadRound(); if (activeInput) activeInput.focus(); }
+  if (roundIndex >= roundsData.length) {
+    // Check if there are wrong rounds to retry
+    if (wrongRounds.length > 0 && !retryMode) {
+      retryMode = true;
+      // Mark retry rounds so they don't get re-added
+      wrongRounds.forEach(r => r._retried = true);
+      roundsData = roundsData.concat(wrongRounds);
+      wrongRounds = [];
+      $('feedback').textContent = '';
+      $('gameTitle').textContent = '\u{1F504} Zopakujeme chybičky!';
+      loadRound();
+    } else {
+      showResult();
+    }
+  } else { loadRound(); if (activeInput) activeInput.focus(); }
 });
 
 function showResult() {
