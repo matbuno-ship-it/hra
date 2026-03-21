@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sárkina Hra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #3d2d79;
+      --purple-mid: #6b5ba7;
+      --purple-light: #e0dcf0;
+      --cream: #fff6f0;
+      --text: #2e455d;
+      --white: #ffffff;
+      --green: #4caf50;
+      --red: #e57373;
+      --pink: #e85d75;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      background-color: var(--cream);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== ANIMATED BACKGROUND ANIMALS ===== */
+    .bg-animals {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-animal {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .bg-animal img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .bg-animal.a1  { top: 2%;  left: 2%;   width: 120px; opacity: 0.13; animation: float1 18s ease-in-out infinite; }
+    .bg-animal.a2  { top: 12%; right: 3%;  width: 100px; opacity: 0.10; animation: float2 22s ease-in-out infinite; }
+    .bg-animal.a3  { top: 35%; left: 5%;   width: 140px; opacity: 0.12; animation: float3 20s ease-in-out infinite; }
+    .bg-animal.a4  { top: 55%; right: 4%;  width: 110px; opacity: 0.11; animation: float1 16s ease-in-out infinite 2s; }
+    .bg-animal.a5  { top: 78%; left: 8%;   width: 90px;  opacity: 0.10; animation: float2 24s ease-in-out infinite 1s; }
+    .bg-animal.a6  { top: 20%; left: 45%;  width: 100px; opacity: 0.08; animation: float3 19s ease-in-out infinite 3s; }
+    .bg-animal.a7  { top: 65%; right: 15%; width: 120px; opacity: 0.10; animation: float1 21s ease-in-out infinite 4s; }
+    .bg-animal.a8  { top: 88%; left: 35%;  width: 95px;  opacity: 0.09; animation: float2 17s ease-in-out infinite 2s; }
+    .bg-animal.a9  { top: 45%; right: 2%;  width: 105px; opacity: 0.11; animation: float3 23s ease-in-out infinite 1s; }
+    .bg-animal.a10 { top: 8%;  left: 25%;  width: 85px;  opacity: 0.09; animation: float1 20s ease-in-out infinite 5s; }
+    .bg-animal.a11 { top: 30%; right: 20%; width: 110px; opacity: 0.08; animation: float2 25s ease-in-out infinite 2s; }
+    .bg-animal.a12 { top: 72%; left: 55%;  width: 100px; opacity: 0.10; animation: float3 18s ease-in-out infinite 4s; }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(20px, -30px) rotate(5deg); }
+      50% { transform: translate(-15px, -50px) rotate(-3deg); }
+      75% { transform: translate(25px, -20px) rotate(4deg); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(-30px, -25px) rotate(-6deg); }
+      66% { transform: translate(20px, -45px) rotate(4deg); }
+    }
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(15px, -35px) scale(1.08); }
+    }
+
+    /* ===== LAYOUT ===== */
+    .app-wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 24px;
+      gap: 32px;
+    }
+
+    .nav-logo {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--purple);
+      letter-spacing: -0.02em;
+      font-style: italic;
+      text-decoration: none;
+    }
+
+    .nav-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple-light);
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--purple);
+    }
+
+    /* ===== SCREENS ===== */
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ===== WELCOME SCREEN ===== */
+    .welcome-mascot {
+      width: 180px;
+      height: auto;
+      margin-bottom: 24px;
+      animation: float3 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 24px rgba(61, 45, 121, 0.15));
+    }
+
+    .welcome h1 {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--purple);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .welcome p {
+      font-size: 22px;
+      line-height: 1.6;
+      max-width: 500px;
+      margin-bottom: 40px;
+      color: var(--text);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 100px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .btn:hover { transform: scale(1.03); }
+    .btn:active { transform: scale(0.97); }
+    .btn:focus-visible { outline: 3px solid var(--purple-light); outline-offset: 3px; }
+
+    .btn-big {
+      background: var(--purple);
+      color: var(--white);
+      padding: 18px 48px;
+      font-size: 22px;
+    }
+
+    .btn-medium {
+      background: var(--purple);
+      color: var(--white);
+      padding: 14px 32px;
+      font-size: 18px;
+    }
+
+    .btn-ghost {
+      background: var(--purple-light);
+      color: var(--purple);
+      padding: 14px 32px;
+      font-size: 18px;
+    }
+
+    /* ===== GAME SCREEN ===== */
+    .game-card {
+      background: var(--white);
+      border-radius: 32px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow:
+        0 4px 12px rgba(61, 45, 121, 0.06),
+        0 16px 48px rgba(61, 45, 121, 0.04);
+      text-align: center;
+    }
+
+    .game-type-label {
+      display: inline-block;
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .game-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--purple);
+      margin-bottom: 8px;
+    }
+
+    .game-instruction {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* === PICTURE GAME === */
+    .picture-display {
+      font-size: 120px;
+      margin-bottom: 24px;
+      min-height: 140px;
+      line-height: 1;
+    }
+
+    .typing-display {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--purple);
+      letter-spacing: 0.15em;
+      margin-bottom: 28px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .typing-display .char {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 62px;
+      border-bottom: 4px solid var(--purple-light);
+      transition: border-color 0.15s ease;
+    }
+
+    .typing-display .char.filled {
+      border-color: var(--purple);
+    }
+
+    .typing-display .char.cursor {
+      border-color: var(--pink);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    /* === MATH GAME === */
+    .math-display {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--purple);
+      margin-bottom: 28px;
+      min-height: 70px;
+      letter-spacing: 0.05em;
+    }
+
+    .math-display .blank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 64px;
+      height: 70px;
+      border-bottom: 5px solid var(--pink);
+      color: var(--pink);
+      margin: 0 4px;
+    }
+
+    /* === DICTATION GAME === */
+    .speaker-btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid var(--purple-light);
+      background: var(--white);
+      font-size: 48px;
+      cursor: pointer;
+      margin-bottom: 24px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .speaker-btn:hover {
+      transform: scale(1.08);
+      border-color: var(--purple);
+    }
+
+    .speaker-btn:active {
+      transform: scale(0.95);
+    }
+
+    .speaker-btn.playing {
+      border-color: var(--purple);
+      animation: pulse-ring 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(61,45,121,0.2); }
+      50% { box-shadow: 0 0 0 16px rgba(61,45,121,0); }
+    }
+
+    /* === ON-SCREEN KEYBOARD === */
+    .keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .kb-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .kb-key {
+      min-width: 40px;
+      height: 52px;
+      border-radius: 12px;
+      border: 2px solid var(--purple-light);
+      background: var(--white);
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--purple);
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      flex: 1;
+      max-width: 52px;
+      padding: 0;
+    }
+
+    .kb-key:hover {
+      background: var(--purple-light);
+    }
+
+    .kb-key:active {
+      transform: scale(0.93);
+      background: var(--purple-light);
+    }
+
+    .kb-key.wide {
+      max-width: 90px;
+      font-size: 16px;
+    }
+
+    .kb-key.dia {
+      background: var(--purple-light);
+      font-size: 18px;
+    }
+
+    .btn-skip {
+      background: none;
+      border: 2px solid var(--purple-light);
+      color: var(--purple-mid);
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .btn-skip:hover { opacity: 0.7; }
+    .btn-skip:active { transform: scale(0.97); }
+
+    .kb-key.correct-flash {
+      background: #c8f7c5;
+      border-color: var(--green);
+    }
+
+    .kb-key.wrong-flash {
+      background: #fdd;
+      border-color: var(--red);
+    }
+
+    /* === MATH ANSWER BUTTONS === */
+    .math-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .math-opt-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      border: 3px solid var(--purple-light);
+      background: var(--white);
+      font-family: 'Nunito', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--purple);
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease, border-color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .math-opt-btn:hover {
+      transform: scale(1.08);
+      border-color: var(--purple);
+      background: var(--purple-light);
+    }
+
+    .math-opt-btn:active { transform: scale(0.95); }
+    .math-opt-btn:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+    .math-opt-btn.correct { background: #c8f7c5; border-color: var(--green); color: #2e7d32; }
+    .math-opt-btn.wrong { background: #fdd; border-color: var(--red); color: #c62828; opacity: 0.6; }
+
+    /* === FEEDBACK === */
+    .feedback {
+      font-size: 26px;
+      font-weight: 800;
+      min-height: 44px;
+      margin: 16px 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .feedback.success { color: var(--green); }
+    .feedback.error { color: var(--red); }
+
+    /* === PROGRESS BAR === */
+    .progress-wrap {
+      width: 100%;
+      max-width: 700px;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: var(--purple-light);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--purple);
+      border-radius: 100px;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--purple-mid);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    /* === RESULT SCREEN === */
+    .result-emoji {
+      font-size: 80px;
+      margin-bottom: 16px;
+    }
+
+    .result h2 {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--purple);
+      margin-bottom: 12px;
+    }
+
+    .result p {
+      font-size: 20px;
+      margin-bottom: 32px;
+    }
+
+    .result .stars {
+      font-size: 48px;
+      margin-bottom: 24px;
+      letter-spacing: 8px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: var(--text);
+      opacity: 0.4;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .welcome h1 { font-size: 38px; }
+      .welcome p { font-size: 18px; }
+      .picture-display { font-size: 90px; min-height: 110px; }
+      .typing-display { font-size: 36px; }
+      .typing-display .char { width: 40px; height: 48px; border-bottom-width: 3px; }
+      .math-display { font-size: 42px; }
+      .math-display .blank { min-width: 50px; height: 54px; border-bottom-width: 4px; }
+      .math-opt-btn { width: 68px; height: 68px; font-size: 28px; }
+      .game-card { padding: 28px 20px; border-radius: 24px; }
+      .kb-key { height: 46px; font-size: 18px; min-width: 32px; }
+      .speaker-btn { width: 80px; height: 80px; font-size: 40px; }
+      nav { gap: 16px; padding: 14px 16px; }
+      .nav-logo { font-size: 24px; }
+    }
+
+    @media (max-width: 400px) {
+      .kb-key { height: 42px; font-size: 16px; }
+      .typing-display .char { width: 32px; height: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND ANIMALS (using provided PNG images) -->
+<div class="bg-animals">
+  <div class="bg-animal a1"><img src="1.png" alt=""></div>
+  <div class="bg-animal a2"><img src="2.png" alt=""></div>
+  <div class="bg-animal a3"><img src="3.png" alt=""></div>
+  <div class="bg-animal a4"><img src="1.png" alt="" style="transform: scaleX(-1);"></div>
+  <div class="bg-animal a5"><img src="2.png" alt="" style="transform: scaleX(-1);"></div>
+  <div class="bg-animal a6"><img src="3.png" alt="" style="transform: scaleX(-1);"></div>
+  <div class="bg-animal a7"><img src="1.png" alt=""></div>
+  <div class="bg-animal a8"><img src="3.png" alt=""></div>
+  <div class="bg-animal a9"><img src="2.png" alt=""></div>
+  <div class="bg-animal a10"><img src="1.png" alt="" style="transform: scaleX(-1);"></div>
+  <div class="bg-animal a11"><img src="2.png" alt=""></div>
+  <div class="bg-animal a12"><img src="3.png" alt="" style="transform: scaleX(-1);"></div>
+</div>
+
+<div class="app-wrap">
+  <!-- NAVBAR -->
+  <nav>
+    <span class="nav-logo">Sárkina Hra</span>
+    <div class="nav-score-wrap" id="navScore" style="display:none;">
+      &#11088; <span id="totalScore">0</span>
+    </div>
+  </nav>
+
+  <!-- WELCOME SCREEN -->
+  <div class="screen welcome active" id="welcomeScreen">
+    <img src="2.png" alt="Maskot" class="welcome-mascot">
+    <h1>Ahoj, Sárka!</h1>
+    <p>Vitaj v tvojej hre! Budeme spolu čítať, počítať a písať. Si pripravená?</p>
+    <button class="btn btn-big" id="startBtn">Poďme na to!</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="gameScreen">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-text" id="progressText">1 / 10</div>
+    </div>
+
+    <div class="game-card" id="gameCard">
+      <div class="game-type-label" id="gameTypeLabel"></div>
+      <h2 class="game-title" id="gameTitle"></h2>
+      <p class="game-instruction" id="gameInstruction"></p>
+
+      <!-- PICTURE GAME CONTENT -->
+      <div id="pictureContent" style="display:none;">
+        <div class="picture-display" id="pictureEmoji"></div>
+        <div class="typing-display" id="typingDisplay"></div>
+        <div class="keyboard" id="keyboard"></div>
+      </div>
+
+      <!-- MATH GAME CONTENT -->
+      <div id="mathContent" style="display:none;">
+        <div class="math-display" id="mathDisplay"></div>
+        <div class="math-options" id="mathOptions"></div>
+      </div>
+
+      <!-- DICTATION GAME CONTENT -->
+      <div id="dictationContent" style="display:none;">
+        <button class="speaker-btn" id="speakerBtn">&#128264;</button>
+        <p class="game-instruction" id="dictationHint" style="font-size:14px; opacity:0.6;"></p>
+        <div class="typing-display" id="dictTypingDisplay"></div>
+        <div class="keyboard" id="dictKeyboard"></div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <button class="btn-skip" id="skipBtn">Neviem &#128584;</button>
+      <button class="btn btn-medium" id="nextBtn" style="display:none;">Ďalej &#10132;</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="screen result" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <h2 id="resultTitle"></h2>
+    <div class="stars" id="resultStars"></div>
+    <p id="resultText"></p>
+    <button class="btn btn-big" id="restartBtn">Hrať znova</button>
+  </div>
+
+  <footer>&copy; 2026 Sárkina Hra</footer>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const ROUNDS_PER_GAME = 12;
+
+// ============================================================
+// PICTURE WORDS – overené Unicode kódy, zvieratá + predmety
+// Každý kód bol manuálne overený cez Unicode tabuľku
+// ============================================================
+const PICTURE_WORDS = [
+  // === ZVIERATÁ ===
+  // U+1F436 = 🐶
+  { emoji: '\u{1F436}', word: 'PES' },
+  // U+1F431 = 🐱
+  { emoji: '\u{1F431}', word: 'MAČKA' },
+  // U+1F41F = 🐟
+  { emoji: '\u{1F41F}', word: 'RYBA' },
+  // U+1F438 = 🐸
+  { emoji: '\u{1F438}', word: 'ŽABA' },
+  // U+1F410 = 🐐
+  { emoji: '\u{1F410}', word: 'KOZA' },
+  // U+1F426 = 🐦
+  { emoji: '\u{1F426}', word: 'VTÁK' },
+  // U+1F434 = 🐴
+  { emoji: '\u{1F434}', word: 'KÔŇ' },
+  // U+1F430 = 🐰
+  { emoji: '\u{1F430}', word: 'ZAJAC' },
+  // U+1F40D = 🐍
+  { emoji: '\u{1F40D}', word: 'HAD' },
+  // U+1F42D = 🐭
+  { emoji: '\u{1F42D}', word: 'MYŠ' },
+  // U+1F989 = 🦉
+  { emoji: '\u{1F989}', word: 'SOVA' },
+  // U+1F418 = 🐘
+  { emoji: '\u{1F418}', word: 'SLON' },
+  // U+1F981 = 🦁
+  { emoji: '\u{1F981}', word: 'LEV' },
+  // U+1F42E = 🐮
+  { emoji: '\u{1F42E}', word: 'KRAVA' },
+  // U+1F411 = 🐑
+  { emoji: '\u{1F411}', word: 'OVCA' },
+  // U+1F41D = 🐝
+  { emoji: '\u{1F41D}', word: 'VČELA' },
+  // U+1F98B = 🦋
+  { emoji: '\u{1F98B}', word: 'MOTÝĽ' },
+  // U+1F43B = 🐻 (medveď, NIE panda!)
+  { emoji: '\u{1F43B}', word: 'MEDVEĎ' },
+  // U+1F98A = 🦊
+  { emoji: '\u{1F98A}', word: 'LÍŠKA' },
+  // U+1F437 = 🐷
+  { emoji: '\u{1F437}', word: 'PRASA' },
+  // U+1F413 = 🐓 (kohút)
+  { emoji: '\u{1F413}', word: 'KOHÚT' },
+  // U+1F43A = 🐺
+  { emoji: '\u{1F43A}', word: 'VLK' },
+  // U+1F41E = 🐞
+  { emoji: '\u{1F41E}', word: 'LIENKA' },
+  // U+1F994 = 🦔
+  { emoji: '\u{1F994}', word: 'JEŽ' },
+  // U+1F43C = 🐼 (panda, NIE medveď!)
+  { emoji: '\u{1F43C}', word: 'PANDA' },
+  // U+1F427 = 🐧
+  { emoji: '\u{1F427}', word: 'TUČNIAK' },
+  // U+1F40C = 🐌
+  { emoji: '\u{1F40C}', word: 'SLIMÁK' },
+  // U+1F42C = 🐬 (delfín, NIE veľryba!)
+  { emoji: '\u{1F42C}', word: 'DELFÍN' },
+  // U+1F985 = 🦅
+  { emoji: '\u{1F985}', word: 'OROL' },
+  // U+1F986 = 🦆
+  { emoji: '\u{1F986}', word: 'KAČKA' },
+  // U+1F435 = 🐵
+  { emoji: '\u{1F435}', word: 'OPICA' },
+  // U+1F40A = 🐊
+  { emoji: '\u{1F40A}', word: 'KROKODÍL' },
+  // U+1F422 = 🐢
+  { emoji: '\u{1F422}', word: 'KORYTNAČKA' },
+  // U+1F980 = 🦀
+  { emoji: '\u{1F980}', word: 'KRAB' },
+  // U+1F414 = 🐔
+  { emoji: '\u{1F414}', word: 'SLIEPKA' },
+
+  // === PREDMETY ===
+  // U+1F3E0 = 🏠
+  { emoji: '\u{1F3E0}', word: 'DOM' },
+  // U+1F697 = 🚗
+  { emoji: '\u{1F697}', word: 'AUTO' },
+  // U+26BD = ⚽
+  { emoji: '\u{26BD}', word: 'LOPTA' },
+  // U+1F4D6 = 📖
+  { emoji: '\u{1F4D6}', word: 'KNIHA' },
+  // U+1F338 = 🌸
+  { emoji: '\u{1F338}', word: 'KVET' },
+  // U+1F333 = 🌳
+  { emoji: '\u{1F333}', word: 'STROM' },
+  // U+1F4A7 = 💧
+  { emoji: '\u{1F4A7}', word: 'VODA' },
+  // U+1F319 = 🌙
+  { emoji: '\u{1F319}', word: 'MESIAC' },
+  // U+2600 = ☀
+  { emoji: '\u{2600}\u{FE0F}', word: 'SLNKO' },
+  // U+2B50 = ⭐
+  { emoji: '\u{2B50}', word: 'HVIEZDA' },
+  // U+1F34E = 🍎
+  { emoji: '\u{1F34E}', word: 'JABLKO' },
+  // U+1F511 = 🔑
+  { emoji: '\u{1F511}', word: 'KĽÚČ' },
+  // U+1F382 = 🎂
+  { emoji: '\u{1F382}', word: 'TORTA' },
+  // U+1F9C0 = 🧀
+  { emoji: '\u{1F9C0}', word: 'SYR' },
+  // U+1F35E = 🍞
+  { emoji: '\u{1F35E}', word: 'CHLIEB' },
+  // U+1F339 = 🌹
+  { emoji: '\u{1F339}', word: 'RUŽA' },
+  // U+1F30A = 🌊
+  { emoji: '\u{1F30A}', word: 'MORE' },
+  // U+1F514 = 🔔
+  { emoji: '\u{1F514}', word: 'ZVON' },
+  // U+1F388 = 🎈
+  { emoji: '\u{1F388}', word: 'BALÓN' },
+  // U+1F9F8 = 🧸
+  { emoji: '\u{1F9F8}', word: 'MACKO' },
+  // U+2615 = ☕
+  { emoji: '\u{2615}', word: 'ČAJ' },
+  // U+1F332 = 🌲
+  { emoji: '\u{1F332}', word: 'LES' },
+  // U+26F0 = ⛰
+  { emoji: '\u{26F0}\u{FE0F}', word: 'HORA' },
+  // U+1F6A2 = 🚢
+  { emoji: '\u{1F6A2}', word: 'LOĎ' },
+  // U+1F308 = 🌈
+  { emoji: '\u{1F308}', word: 'DÚHA' },
+  // U+1F381 = 🎁
+  { emoji: '\u{1F381}', word: 'DARČEK' },
+  // U+1F451 = 👑
+  { emoji: '\u{1F451}', word: 'KORUNA' },
+  // U+1F34C = 🍌
+  { emoji: '\u{1F34C}', word: 'BANÁN' },
+  // U+1F392 = 🎒
+  { emoji: '\u{1F392}', word: 'TAŠKA' },
+  // U+1F353 = 🍓
+  { emoji: '\u{1F353}', word: 'JAHODA' },
+  // U+1F347 = 🍇
+  { emoji: '\u{1F347}', word: 'HROZNO' },
+  // U+1F95B = 🥛
+  { emoji: '\u{1F95B}', word: 'MLIEKO' },
+  // U+270F = ✏
+  { emoji: '\u{270F}\u{FE0F}', word: 'CERUZKA' },
+];
+
+// ============================================================
+// DICTATION WORDS – len reálne slovenské slová
+// ============================================================
+const DICTATION_WORDS = [
+  // 3-písmenkové
+  'PES', 'DOM', 'HAD', 'MED', 'SYR', 'LEV', 'VLK', 'DUB',
+  'LES', 'MYŠ', 'KOŇ', 'SOĽ', 'LOĎ', 'DEŇ', 'KOT', 'JEŽ',
+  'ČAJ', 'NOS', 'OKO', 'UHO', 'LUK', 'SAD', 'RAK',
+  // 4-písmenkové
+  'MAMA', 'TATA', 'RYBA', 'KOZA', 'ŽABA', 'VODA', 'RUŽA',
+  'KVET', 'OKNO', 'AUTO', 'OVCA', 'SOVA', 'VTÁK', 'HORA',
+  'MORE', 'KRAB', 'DÚHA', 'SLON', 'OROL', 'TORTA',
+  // 5-písmenkové
+  'MAČKA', 'LOPTA', 'KNIHA', 'ZAJAC', 'PANDA', 'MACKO',
+  'SLNKO', 'BANÁN', 'TAŠKA', 'KRAVA', 'PRASA', 'KOHÚT',
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let totalScore = 0;
+let roundIndex = 0;
+let roundsData = [];
+let currentRound = null;
+let answered = false;
+let typedChars = [];
+let targetWord = '';
+
+const $ = id => document.getElementById(id);
+
+// ============================================================
+// UTILS
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pick(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+// ============================================================
+// GENERATE ROUNDS
+// ============================================================
+function generateRounds() {
+  const rounds = [];
+  const types = [];
+  for (let i = 0; i < ROUNDS_PER_GAME; i++) {
+    types.push(i % 3);
+  }
+  const rest = shuffle(types.slice(1));
+  const ordered = [0, ...rest];
+
+  const picWords = pick(PICTURE_WORDS, 6);
+  const dictWords = pick(DICTATION_WORDS, 6);
+  let picIdx = 0, dictIdx = 0;
+
+  for (let i = 0; i < ROUNDS_PER_GAME; i++) {
+    const type = ordered[i];
+    if (type === 0) {
+      rounds.push({ type: 'picture', data: picWords[picIdx % picWords.length] });
+      picIdx++;
+    } else if (type === 1) {
+      rounds.push({ type: 'math', data: generateMathProblem() });
+    } else {
+      rounds.push({ type: 'dictation', data: { word: dictWords[dictIdx % dictWords.length] } });
+      dictIdx++;
+    }
+  }
+  return rounds;
+}
+
+function generateMathProblem() {
+  const problemType = randInt(0, 4);
+  let a, b, result, display, answer, options;
+
+  switch (problemType) {
+    case 0:
+      a = randInt(0, 9); b = randInt(0, 10 - a);
+      result = a + b; answer = result;
+      display = `${a} + ${b} = <span class="blank">?</span>`;
+      break;
+    case 1:
+      a = randInt(1, 10); b = randInt(0, a);
+      result = a - b; answer = result;
+      display = `${a} &minus; ${b} = <span class="blank">?</span>`;
+      break;
+    case 2:
+      result = randInt(1, 10); b = randInt(0, result);
+      a = result - b; answer = a;
+      display = `<span class="blank">?</span> + ${b} = ${result}`;
+      break;
+    case 3:
+      result = randInt(1, 10); a = randInt(0, result);
+      b = result - a; answer = b;
+      display = `${a} + <span class="blank">?</span> = ${result}`;
+      break;
+    case 4:
+      a = randInt(1, 10); result = randInt(0, a);
+      b = a - result; answer = b;
+      display = `${a} &minus; <span class="blank">?</span> = ${result}`;
+      break;
+  }
+
+  const opts = new Set([answer]);
+  while (opts.size < 4) {
+    let wrong = answer + randInt(-3, 3);
+    if (wrong < 0) wrong = randInt(0, 10);
+    if (wrong > 10) wrong = randInt(0, 10);
+    opts.add(wrong);
+  }
+  options = shuffle([...opts]);
+  return { display, answer, options };
+}
+
+// ============================================================
+// KEYBOARD – s diakritikou
+// ============================================================
+const KB_ROWS = [
+  ['Q','W','E','R','T','Z','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Y','X','C','V','B','N','M','⌫'],
+];
+
+const KB_DIA_ROWS = [
+  ['Á','Ä','Č','Ď','É','Í','Ľ','Ĺ','Ň','Ó'],
+  ['Ô','Ŕ','Š','Ť','Ú','Ý','Ž'],
+];
+
+function buildKeyboard(containerId, onKey) {
+  const container = $(containerId);
+  container.innerHTML = '';
+
+  // Check if the target word needs diacritics
+  const needsDia = /[ÁÄČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]/.test(targetWord);
+
+  KB_ROWS.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'kb-row';
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'kb-key' + (key === '⌫' ? ' wide' : '');
+      btn.textContent = key;
+      btn.addEventListener('click', () => onKey(key));
+      rowDiv.appendChild(btn);
+    });
+    container.appendChild(rowDiv);
+  });
+
+  // Always show diacritics row for Slovak
+  if (needsDia) {
+    KB_DIA_ROWS.forEach(row => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'kb-row';
+      row.forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'kb-key dia';
+        btn.textContent = key;
+        btn.addEventListener('click', () => onKey(key));
+        rowDiv.appendChild(btn);
+      });
+      container.appendChild(rowDiv);
+    });
+  }
+}
+
+// ============================================================
+// TYPING DISPLAY
+// ============================================================
+function updateTypingDisplay(displayId, word, typed) {
+  const container = $(displayId);
+  container.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const span = document.createElement('span');
+    span.className = 'char';
+    if (i < typed.length) {
+      span.textContent = typed[i];
+      span.classList.add('filled');
+    } else if (i === typed.length) {
+      span.classList.add('cursor');
+    }
+    container.appendChild(span);
+  }
+}
+
+// ============================================================
+// TTS – pomalý, zrozumiteľný hlas
+// ============================================================
+let ttsVoice = null;
+
+function initVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer Slovak voice, fallback to Czech, then any
+  ttsVoice = voices.find(v => v.lang === 'sk-SK')
+           || voices.find(v => v.lang.startsWith('sk'))
+           || voices.find(v => v.lang.startsWith('cs'))
+           || null;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  // Spell out the word letter by letter first, then say the whole word
+  const word = text.toLowerCase();
+
+  // Say the whole word slowly and clearly
+  const utter = new SpeechSynthesisUtterance(word);
+  utter.lang = 'sk-SK';
+  utter.rate = 0.55;   // veľmi pomaly
+  utter.pitch = 1.15;  // trochu vyšší, detský hlas
+  utter.volume = 1;
+  if (ttsVoice) utter.voice = ttsVoice;
+
+  const btn = $('speakerBtn');
+  btn.classList.add('playing');
+  utter.onend = () => {
+    // After a pause, say it again
+    setTimeout(() => {
+      const utter2 = new SpeechSynthesisUtterance(word);
+      utter2.lang = 'sk-SK';
+      utter2.rate = 0.45;
+      utter2.pitch = 1.15;
+      utter2.volume = 1;
+      if (ttsVoice) utter2.voice = ttsVoice;
+      utter2.onend = () => btn.classList.remove('playing');
+      utter2.onerror = () => btn.classList.remove('playing');
+      window.speechSynthesis.speak(utter2);
+    }, 600);
+  };
+  utter.onerror = () => btn.classList.remove('playing');
+  window.speechSynthesis.speak(utter);
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startGame() {
+  totalScore = 0;
+  roundIndex = 0;
+  $('totalScore').textContent = '0';
+  $('navScore').style.display = 'flex';
+  roundsData = generateRounds();
+  showScreen('gameScreen');
+  loadRound();
+}
+
+function loadRound() {
+  answered = false;
+  typedChars = [];
+  currentRound = roundsData[roundIndex];
+
+  $('progressFill').style.width = ((roundIndex / ROUNDS_PER_GAME) * 100) + '%';
+  $('progressText').textContent = `${roundIndex + 1} / ${ROUNDS_PER_GAME}`;
+
+  $('pictureContent').style.display = 'none';
+  $('mathContent').style.display = 'none';
+  $('dictationContent').style.display = 'none';
+  $('feedback').textContent = '';
+  $('feedback').className = 'feedback';
+  $('nextBtn').style.display = 'none';
+  $('skipBtn').style.display = 'inline-block';
+
+  if (currentRound.type === 'picture') {
+    loadPictureRound();
+  } else if (currentRound.type === 'math') {
+    loadMathRound();
+  } else {
+    loadDictationRound();
+  }
+}
+
+// === PICTURE ROUND ===
+function loadPictureRound() {
+  const data = currentRound.data;
+  $('gameTypeLabel').innerHTML = '&#128444; Obrázok';
+  $('gameTitle').textContent = 'Čo je na obrázku?';
+  $('gameInstruction').textContent = 'Napíš slovo, ktoré vidíš na obrázku.';
+  $('pictureEmoji').textContent = data.emoji;
+  $('pictureContent').style.display = 'block';
+
+  targetWord = data.word;
+  typedChars = [];
+  updateTypingDisplay('typingDisplay', targetWord, typedChars);
+  buildKeyboard('keyboard', handlePictureKey);
+}
+
+function handlePictureKey(key) {
+  if (answered) return;
+  if (key === '⌫') {
+    typedChars.pop();
+  } else if (typedChars.length < targetWord.length) {
+    typedChars.push(key);
+  }
+  updateTypingDisplay('typingDisplay', targetWord, typedChars);
+
+  if (typedChars.length === targetWord.length) {
+    const typed = typedChars.join('');
+    if (typed === targetWord) {
+      onCorrect();
+    } else {
+      onWrong();
+      setTimeout(() => {
+        if (!answered) {
+          typedChars = [];
+          updateTypingDisplay('typingDisplay', targetWord, typedChars);
+          $('feedback').textContent = '';
+          $('feedback').className = 'feedback';
+        }
+      }, 1200);
+    }
+  }
+}
+
+// === MATH ROUND ===
+function loadMathRound() {
+  const data = currentRound.data;
+  $('gameTypeLabel').innerHTML = '&#128290; Matematika';
+  $('gameTitle').textContent = 'Vypočítaj!';
+  $('gameInstruction').textContent = 'Vyber správne číslo.';
+  $('mathDisplay').innerHTML = data.display;
+  $('mathContent').style.display = 'block';
+
+  const container = $('mathOptions');
+  container.innerHTML = '';
+  data.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'math-opt-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => handleMathAnswer(opt, btn));
+    container.appendChild(btn);
+  });
+}
+
+function handleMathAnswer(value, btn) {
+  if (answered) return;
+  if (value === currentRound.data.answer) {
+    btn.classList.add('correct');
+    onCorrect();
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    $('feedback').innerHTML = '&#10060; Skús znova!';
+    $('feedback').className = 'feedback error';
+  }
+}
+
+// === DICTATION ROUND ===
+function loadDictationRound() {
+  const data = currentRound.data;
+  $('gameTypeLabel').innerHTML = '&#128265; Diktát';
+  $('gameTitle').textContent = 'Napíš, čo počuješ';
+  $('gameInstruction').textContent = 'Stlač reproduktor a napíš slovo.';
+  $('dictationHint').textContent = `Nápoveda: ${data.word.length} písmen`;
+  $('dictationContent').style.display = 'block';
+
+  targetWord = data.word;
+  typedChars = [];
+  updateTypingDisplay('dictTypingDisplay', targetWord, typedChars);
+  buildKeyboard('dictKeyboard', handleDictationKey);
+
+  setTimeout(() => speak(data.word), 500);
+}
+
+$('speakerBtn').addEventListener('click', () => {
+  if (currentRound && currentRound.type === 'dictation') {
+    speak(currentRound.data.word);
+  }
+});
+
+function handleDictationKey(key) {
+  if (answered) return;
+  if (key === '⌫') {
+    typedChars.pop();
+  } else if (typedChars.length < targetWord.length) {
+    typedChars.push(key);
+  }
+  updateTypingDisplay('dictTypingDisplay', targetWord, typedChars);
+
+  if (typedChars.length === targetWord.length) {
+    const typed = typedChars.join('');
+    if (typed === targetWord) {
+      onCorrect();
+    } else {
+      onWrong();
+      setTimeout(() => {
+        if (!answered) {
+          typedChars = [];
+          updateTypingDisplay('dictTypingDisplay', targetWord, typedChars);
+          $('feedback').textContent = '';
+          $('feedback').className = 'feedback';
+        }
+      }, 1200);
+    }
+  }
+}
+
+// ============================================================
+// CORRECT / WRONG / SKIP
+// ============================================================
+function onCorrect() {
+  answered = true;
+  totalScore++;
+  $('totalScore').textContent = totalScore;
+  $('feedback').innerHTML = '&#127881; Výborne, Sárka!';
+  $('feedback').className = 'feedback success';
+  $('nextBtn').style.display = 'inline-block';
+  $('skipBtn').style.display = 'none';
+}
+
+function onWrong() {
+  $('feedback').innerHTML = '&#10060; Skús to znova!';
+  $('feedback').className = 'feedback error';
+}
+
+function onSkip() {
+  answered = true;
+  $('skipBtn').style.display = 'none';
+
+  // Show the correct answer
+  let answer = '';
+  if (currentRound.type === 'picture') {
+    answer = currentRound.data.word;
+  } else if (currentRound.type === 'math') {
+    answer = currentRound.data.answer;
+  } else {
+    answer = currentRound.data.word;
+  }
+  $('feedback').innerHTML = `&#128161; Správna odpoveď: <strong>${answer}</strong>`;
+  $('feedback').className = 'feedback error';
+  $('nextBtn').style.display = 'inline-block';
+}
+
+$('skipBtn').addEventListener('click', onSkip);
+
+// ============================================================
+// NEXT / RESULT
+// ============================================================
+$('nextBtn').addEventListener('click', () => {
+  roundIndex++;
+  if (roundIndex >= ROUNDS_PER_GAME) {
+    showResult();
+  } else {
+    loadRound();
+  }
+});
+
+function showResult() {
+  showScreen('resultScreen');
+  const pct = totalScore / ROUNDS_PER_GAME;
+  let emoji, title, stars;
+
+  if (pct === 1) {
+    emoji = '&#127942;'; title = 'Perfektné, Sárka!'; stars = '&#11088;&#11088;&#11088;';
+  } else if (pct >= 0.7) {
+    emoji = '&#127881;'; title = 'Skvelá práca, Sárka!'; stars = '&#11088;&#11088;';
+  } else if (pct >= 0.4) {
+    emoji = '&#128170;'; title = 'Dobre, skúsime znova?'; stars = '&#11088;';
+  } else {
+    emoji = '&#128522;'; title = 'Nevadí, cvičíme ďalej!'; stars = '';
+  }
+
+  $('resultEmoji').innerHTML = emoji;
+  $('resultTitle').textContent = title;
+  $('resultStars').innerHTML = stars;
+  $('resultText').textContent = `Správne: ${totalScore} z ${ROUNDS_PER_GAME}`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+$('startBtn').addEventListener('click', startGame);
+$('restartBtn').addEventListener('click', startGame);
+
+// Load TTS voices
+if ('speechSynthesis' in window) {
+  initVoices();
+  speechSynthesis.onvoiceschanged = initVoices;
+}
+
+// Physical keyboard support (for desktop/laptop)
+document.addEventListener('keydown', (e) => {
+  if (!$('gameScreen').classList.contains('active')) return;
+  if (answered) return;
+
+  const key = e.key.toUpperCase();
+  const allKeys = 'AÁÄBCČDĎEÉFGHIÍJKĽĹLMNŇOÓÔPQRŔSŠTŤUÚVWXYÝZŽ';
+
+  if (key === 'BACKSPACE') {
+    if (currentRound.type === 'picture') handlePictureKey('⌫');
+    if (currentRound.type === 'dictation') handleDictationKey('⌫');
+  } else if (allKeys.includes(key)) {
+    if (currentRound.type === 'picture') handlePictureKey(key);
+    if (currentRound.type === 'dictation') handleDictationKey(key);
+  }
+});
+</script>
+
+</body>
+</html>
