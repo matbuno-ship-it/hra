@@ -483,8 +483,8 @@ function mascotReact(type){ /* no-op during game */ }
 let skVoice=null;
 function initVoices(){if(!('speechSynthesis' in window))return;const v=speechSynthesis.getVoices();skVoice=v.find(x=>x.lang==='sk-SK'&&x.name.includes('Microsoft'))||v.find(x=>x.lang==='sk-SK'&&x.name.includes('Google'))||v.find(x=>x.lang==='sk-SK')||v.find(x=>x.lang.startsWith('sk'))||v.find(x=>x.lang==='cs-CZ')||v.find(x=>x.lang.startsWith('cs'))||null;}
 if('speechSynthesis' in window){initVoices();speechSynthesis.onvoiceschanged=initVoices;}
-function speakFB(text){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const btn=$('speakerBtn');btn.classList.add('playing');function mk(r){const u=new SpeechSynthesisUtterance(text.toLowerCase());if(skVoice){u.voice=skVoice;u.lang=skVoice.lang;}else u.lang='sk-SK';u.rate=r;u.pitch=1.05;return u;}const u1=mk(.65);u1.onend=()=>setTimeout(()=>{const u2=mk(.5);u2.onend=()=>btn.classList.remove('playing');u2.onerror=()=>btn.classList.remove('playing');speechSynthesis.speak(u2);},600);u1.onerror=()=>btn.classList.remove('playing');speechSynthesis.speak(u1);}
-function speak(text){const w=text.toLowerCase(),btn=$('speakerBtn');btn.classList.add('playing');const url='https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q='+encodeURIComponent(w);const a=new Audio();a.crossOrigin='anonymous';a.oncanplaythrough=()=>a.play().catch(()=>speakFB(text));a.onended=()=>setTimeout(()=>{const a2=new Audio();a2.crossOrigin='anonymous';a2.src=url;a2.onended=()=>btn.classList.remove('playing');a2.onerror=()=>btn.classList.remove('playing');a2.play().catch(()=>btn.classList.remove('playing'));},500);a.onerror=()=>speakFB(text);a.src=url;}
+function speakFB(text){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const btn=$('speakerBtn');if(btn)btn.classList.add('playing');function mk(r){const u=new SpeechSynthesisUtterance(text.toLowerCase());if(skVoice){u.voice=skVoice;u.lang=skVoice.lang;}else u.lang='sk-SK';u.rate=r;u.pitch=1.05;return u;}const u1=mk(.65);u1.onend=()=>setTimeout(()=>{const u2=mk(.5);u2.onend=()=>{if(btn)btn.classList.remove('playing');};u2.onerror=()=>{if(btn)btn.classList.remove('playing');};speechSynthesis.speak(u2);},600);u1.onerror=()=>{if(btn)btn.classList.remove('playing');};speechSynthesis.speak(u1);}
+function speak(text){const w=text.toLowerCase(),btn=$('speakerBtn');if(btn)btn.classList.add('playing');const url='https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q='+encodeURIComponent(w);const a=new Audio();a.crossOrigin='anonymous';a.oncanplaythrough=()=>a.play().catch(()=>speakFB(text));a.onended=()=>setTimeout(()=>{const a2=new Audio();a2.crossOrigin='anonymous';a2.src=url;a2.onended=()=>{if(btn)btn.classList.remove('playing');};a2.onerror=()=>{if(btn)btn.classList.remove('playing');};a2.play().catch(()=>{if(btn)btn.classList.remove('playing');});},500);a.onerror=()=>speakFB(text);a.src=url;}
 
 // ============================================================
 // ROUND GENERATION PER LEVEL
@@ -724,6 +724,9 @@ function showResult(){
 }
 
 $('backToMapBtn').addEventListener('click',()=>{showScreen('mapScreen');renderMap();});
+
+// RESET – pridaj ?reset do URL pre vymazanie progresu
+if(location.search.includes('reset')){localStorage.removeItem(SK);history.replaceState(null,'',location.pathname);}
 
 // INIT
 renderMap();
