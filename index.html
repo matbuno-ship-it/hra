@@ -924,47 +924,70 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================================
-// TTS – Google Translate TTS (pekný slovenský hlas)
+// TTS – Web Speech API s najlepším dostupným hlasom
 // ============================================================
+let bestVoice = null;
+
+function initVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return;
+
+  // Preference: Microsoft Slovak > Google Slovak > any Slovak > Czech > default
+  bestVoice =
+    voices.find(v => v.lang.startsWith('sk') && v.name.includes('Microsoft')) ||
+    voices.find(v => v.lang.startsWith('sk') && v.name.includes('Google')) ||
+    voices.find(v => v.lang === 'sk-SK') ||
+    voices.find(v => v.lang.startsWith('sk')) ||
+    voices.find(v => v.lang.startsWith('cs') && v.name.includes('Microsoft')) ||
+    voices.find(v => v.lang.startsWith('cs')) ||
+    null;
+
+  console.log('TTS voice:', bestVoice ? bestVoice.name + ' (' + bestVoice.lang + ')' : 'default');
+}
+
 function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+
   const word = text.toLowerCase();
   const btn = $('speakerBtn');
+
+  // Cancel any previous speech
+  window.speechSynthesis.cancel();
+
   btn.classList.add('playing');
 
-  // Use Google Translate TTS – natural Slovak voice
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=sk&client=tw-ob&q=${encodeURIComponent(word)}`;
-  const audio = new Audio(url);
-  audio.playbackRate = 0.85; // trochu pomalšie
+  // First utterance – normal speed
+  const u1 = new SpeechSynthesisUtterance(word);
+  u1.lang = 'sk-SK';
+  u1.rate = 0.6;
+  u1.pitch = 1.05;
+  u1.volume = 1;
+  if (bestVoice) u1.voice = bestVoice;
 
-  audio.onended = () => {
-    // Prehraj ešte raz po pauze
+  u1.onend = () => {
+    // Second utterance – slower, after pause
     setTimeout(() => {
-      const audio2 = new Audio(url);
-      audio2.playbackRate = 0.75; // ešte pomalšie
-      audio2.onended = () => btn.classList.remove('playing');
-      audio2.onerror = () => btn.classList.remove('playing');
-      audio2.play().catch(() => btn.classList.remove('playing'));
-    }, 700);
+      const u2 = new SpeechSynthesisUtterance(word);
+      u2.lang = 'sk-SK';
+      u2.rate = 0.45;
+      u2.pitch = 1.05;
+      u2.volume = 1;
+      if (bestVoice) u2.voice = bestVoice;
+      u2.onend = () => btn.classList.remove('playing');
+      u2.onerror = () => btn.classList.remove('playing');
+      window.speechSynthesis.speak(u2);
+    }, 800);
   };
 
-  audio.onerror = () => {
-    // Fallback na Web Speech API ak Google nefunguje
-    btn.classList.remove('playing');
-    if ('speechSynthesis' in window) {
-      const utter = new SpeechSynthesisUtterance(word);
-      utter.lang = 'sk-SK';
-      utter.rate = 0.55;
-      utter.pitch = 1.1;
-      btn.classList.add('playing');
-      utter.onend = () => btn.classList.remove('playing');
-      window.speechSynthesis.speak(utter);
-    }
-  };
+  u1.onerror = () => btn.classList.remove('playing');
+  window.speechSynthesis.speak(u1);
+}
 
-  audio.play().catch(() => {
-    // Fallback
-    audio.onerror();
-  });
+// Init voices (may load async)
+if ('speechSynthesis' in window) {
+  initVoices();
+  speechSynthesis.onvoiceschanged = initVoices;
 }
 
 // ============================================================
