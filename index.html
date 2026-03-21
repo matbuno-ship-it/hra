@@ -38,23 +38,44 @@ nav{display:flex;align-items:center;justify-content:center;padding:12px 16px;gap
 .mc .bub .nm{font-size:10px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px;display:block}
 @keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
 
-/* WORLD MAP */
-.world-tabs{display:flex;gap:0;width:100%;max-width:500px;margin-bottom:12px;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.wtab{flex:1;padding:12px 8px;font-size:13px;font-weight:800;text-align:center;cursor:pointer;border:none;font-family:'Nunito',sans-serif;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
-.wtab:hover{opacity:.85}
-.wtab.w0{background:#2d6a4f;color:#a7f3d0}.wtab.w1{background:#1d3557;color:#a2d2ff}.wtab.w2{background:#b08968;color:#fefae0}
-.wtab.active{opacity:1;font-size:14px;box-shadow:inset 0 -3px 0 rgba(255,255,255,.4)}
-.wtab.locked{opacity:.35;cursor:default}
+/* INTRO SLIDES */
+.intro-slide{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:24px;text-align:center;max-width:420px;margin:0 auto}
+.intro-slide .intro-emoji{font-size:100px;margin-bottom:20px;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.intro-slide .intro-img{width:140px;margin-bottom:16px;filter:drop-shadow(0 6px 16px rgba(61,45,121,.12));animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.intro-slide h2{font-size:28px;font-weight:900;color:var(--purple);margin-bottom:10px;line-height:1.2}
+.intro-slide p{font-size:18px;line-height:1.5;color:var(--text);margin-bottom:24px}
+.intro-dots{display:flex;gap:8px;margin-bottom:20px}
+.intro-dot{width:10px;height:10px;border-radius:50%;background:var(--plight)}
+.intro-dot.active{background:var(--purple);transform:scale(1.2)}
 
-.world-title{font-size:20px;font-weight:900;margin-bottom:4px}
-.world-sub{font-size:14px;font-weight:600;color:var(--pmid);margin-bottom:12px}
+/* WORLD CARDS (namiesto tabs) */
+.world-cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px;margin-bottom:16px}
+.world-card{border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
+.world-card:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.world-card:active{transform:scale(.98)}
+.world-card.locked{opacity:.45;cursor:default;filter:grayscale(.5)}
+.world-card.locked:hover{transform:none;box-shadow:none}
+.world-card .wc-icon{font-size:44px;flex-shrink:0}
+.world-card .wc-info{flex:1;text-align:left}
+.world-card .wc-name{font-size:18px;font-weight:900;color:var(--white)}
+.world-card .wc-desc{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);margin-top:2px}
+.world-card .wc-progress{display:flex;gap:4px;margin-top:6px}
+.world-card .wc-pip{width:28px;height:6px;border-radius:100px;background:rgba(255,255,255,.25)}
+.world-card .wc-pip.filled{background:rgba(255,255,255,.8)}
+.world-card .wc-mascot{width:50px;height:auto;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
+.world-card.w0c{background:linear-gradient(135deg,#2d6a4f,#40916c)}
+.world-card.w1c{background:linear-gradient(135deg,#1d3557,#457b9d)}
+.world-card.w2c{background:linear-gradient(135deg,#b08968,#dda15e)}
+.world-card .wc-lock{position:absolute;right:16px;font-size:24px;opacity:.6}
 
-/* Map pieces */
+/* Map pieces (inside world detail) */
 .map-pieces{display:flex;gap:8px;margin-bottom:16px;width:100%;max-width:400px;justify-content:center}
-.map-piece{flex:1;height:70px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.2);transition:transform .2s}
-.map-piece .fog{position:absolute;inset:0;background:rgba(100,100,100,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,.5);transition:opacity .5s}
+.map-piece{flex:1;height:70px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.2)}
+.map-piece .fog{position:absolute;inset:0;background:rgba(100,100,100,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.5);transition:opacity .5s}
 .map-piece .fog.revealed{opacity:0;pointer-events:none}
 .w0bg{background:linear-gradient(135deg,#2d6a4f,#40916c)}.w1bg{background:linear-gradient(135deg,#1d3557,#457b9d)}.w2bg{background:linear-gradient(135deg,#b08968,#dda15e)}
+
+.back-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:8px;color:var(--purple);-webkit-tap-highlight-color:transparent;align-self:flex-start;margin-bottom:8px}
 
 /* Level nodes */
 .level-list{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:360px}
@@ -211,10 +232,22 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <div class="score-pill" id="scr" style="display:none">&#11088; <span id="scrV">0</span></div>
 </nav>
 
-<!-- MAP -->
-<div class="screen active" id="mapScr">
-<div class="mc" id="mapMC"><img src="2.png" alt="Lili" class=""><div class="bub"><span class="nm">Lili</span><span id="mapMsg">Sárka, pomôž nám nájsť mláďatká!</span></div></div>
-<div class="world-tabs" id="wtabs"></div>
+<!-- INTRO -->
+<div class="screen active" id="introScr">
+<div class="intro-slide" id="introSlide"></div>
+<div class="intro-dots" id="introDots"></div>
+<button class="btn btn-b" id="introBtn">Dalej</button>
+</div>
+
+<!-- WORLD SELECT -->
+<div class="screen" id="mapScr">
+<div class="mc" id="mapMC"><img src="2.png" alt="Lili" class=""><div class="bub"><span class="nm">Lili</span><span id="mapMsg">Vyber si svet, Sárka!</span></div></div>
+<div class="world-cards" id="worldCards"></div>
+</div>
+
+<!-- WORLD DETAIL (levels) -->
+<div class="screen" id="worldScr">
+<button class="back-btn" id="backBtn">&larr; Spat</button>
 <div class="world-title" id="wTitle"></div>
 <div class="world-sub" id="wSub"></div>
 <div class="map-pieces" id="mapPcs"></div>
@@ -363,38 +396,14 @@ function spkFB(text){if(!('speechSynthesis' in window))return;speechSynthesis.ca
 // ============================================================
 // MAP RENDERING
 // ============================================================
-function renderMap(worldIdx){
+function renderWorldDetail(worldIdx){
   if(worldIdx===undefined)worldIdx=curW;
   curW=worldIdx;
   const d=ld();
-  // Streak
-  const today=new Date().toISOString().slice(0,10),yest=new Date(Date.now()-864e5).toISOString().slice(0,10);
-  const sa=d.streak.d===today||d.streak.d===yest;
-  if(sa&&d.streak.c>0){$('stk').style.display='flex';$('stk').textContent='\u{1F525} '+d.streak.c;}else $('stk').style.display='none';
-
-  // World tabs
-  const tabs=$('wtabs');tabs.innerHTML='';
-  WORLDS.forEach((w,i)=>{
-    const t=document.createElement('button');
-    const unlocked=wUnlocked(d,i);
-    t.className='wtab '+w.color+(i===worldIdx?' active':'')+(unlocked?'':' locked');
-    t.textContent=w.icon+' '+w.name;
-    if(unlocked)t.addEventListener('click',()=>renderMap(i));
-    tabs.appendChild(t);
-  });
-
   const w=WORLDS[worldIdx];
   $('wTitle').textContent=w.icon+' '+w.name;
   $('wTitle').style.color=worldIdx===0?'#2d6a4f':worldIdx===1?'#1d3557':'#b08968';
   $('wSub').textContent=worldIdx===0?'Lili hľadá vlčiatko Lukáša':worldIdx===1?'Moli hľadá srnčiatko Nellu':'Lili a Moli spoja sily!';
-
-  // Mascot msg
-  const mapMC=$('mapMC');
-  mapMC.querySelector('img').src=w.mascot;
-  $('mapMsg').textContent=d.stats.g===0?'Sárka, pomôž nám nájsť mláďatká!':
-    d.done?'Ďakujeme, Sárka! Všetci sú v bezpečí!':
-    worldIdx===0?'Poďme hľadať Lukáša v lese!':worldIdx===1?'Nella musí byť niekde pri rieke!':'Už sme blízko! Ešte kúsok!';
-  mapMC.querySelector('.nm').textContent=w.mascotName;
 
   // Map pieces
   const mp=$('mapPcs');mp.innerHTML='';
@@ -474,7 +483,7 @@ function openChest(wi,ci,parts){
   const ov=document.createElement('div');
   ov.className='chest-ov';
   ov.innerHTML='<div class="big">\u{1F381}</div><div class="story"><span class="clue">'+parts[2]+'</span>'+parts[3]+'<br><br><em>'+parts[1]+'</em></div>';
-  ov.addEventListener('click',()=>{ov.remove();renderMap(wi);});
+  ov.addEventListener('click',()=>{ov.remove();ss('worldScr');renderWorldDetail(wi);});
   document.body.appendChild(ov);
   conf();
 }
@@ -484,7 +493,7 @@ function showFinale(){
   $('finMsg').innerHTML='Lukáš a Nella čakali na kopci pri ohníku.<br><br>Lili: "Lukáš! Konečne!"<br>Moli: "Nella, moja malá!"<br><br>Nella: "Mama, my sme sa nestratili! My sme vám hľadali poklad!"<br><br><strong>Ďakujeme, Sárka! Bez teba by sme ich nenašli!</strong>';
   conf();ps('win');
 }
-$('finBtn').addEventListener('click',()=>{ss('mapScr');renderMap();});
+$('finBtn').addEventListener('click',()=>{ss('mapScr');renderWorldSelect();});
 
 // ============================================================
 // GAME
@@ -618,13 +627,105 @@ function showRes(){
   if(pct>=.75)ps('win');
 }
 
-$('resBack').addEventListener('click',()=>{ss('mapScr');renderMap(curW);});
+$('resBack').addEventListener('click',()=>{ss('worldScr');renderWorldDetail(curW);});
+
+// ============================================================
+// INTRO SLIDES
+// ============================================================
+const INTRO_SLIDES=[
+  {emoji:'',img:'2.png',title:'Ahoj, Sárka!',text:'Ja som vlčica Lili a toto je moja kamarátka srnka Moli.',img2:'1.png'},
+  {emoji:'\u{1F43A}\u{1F98C}',title:'Naše mláďatká',text:'Moje vlčiatko Lukáš a Molina srnka Nella sa spolu hrali v lese...'},
+  {emoji:'\u{1F332}\u{2753}',title:'A stratili sa!',text:'Nevieme kde sú! Pomôžeš nám ich nájsť? Čakajú nás tri svety plné úloh.'},
+  {emoji:'\u{1F5FA}\u{FE0F}',title:'Zbieraj mapu!',text:'Za každú truhlicu nájdeš kúsok mapy. Keď poskladáš mapu, nájdeš cestu k mláďatkám!'},
+];
+let introIdx=0;
+function showIntro(){
+  const d=ld();
+  // Skip intro if already played
+  if(d.stats.g>0){ss('mapScr');renderWorldSelect();return;}
+  ss('introScr');
+  introIdx=0;
+  renderIntroSlide();
+}
+function renderIntroSlide(){
+  const s=INTRO_SLIDES[introIdx];
+  const slide=$('introSlide');
+  let html='';
+  if(s.img){
+    html+=`<img src="${s.img}" class="intro-img">`;
+    if(s.img2)html+=`<img src="${s.img2}" class="intro-img" style="margin-top:-20px">`;
+  }else if(s.emoji){
+    html+=`<div class="intro-emoji">${s.emoji}</div>`;
+  }
+  html+=`<h2>${s.title}</h2><p>${s.text}</p>`;
+  slide.innerHTML=html;
+
+  // Dots
+  const dots=$('introDots');dots.innerHTML='';
+  INTRO_SLIDES.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='intro-dot'+(i===introIdx?' active':'');
+    dots.appendChild(d);
+  });
+
+  $('introBtn').textContent=introIdx===INTRO_SLIDES.length-1?'Poďme hľadať!':'Ďalej';
+}
+$('introBtn').addEventListener('click',()=>{
+  introIdx++;
+  if(introIdx>=INTRO_SLIDES.length){ss('mapScr');renderWorldSelect();}
+  else renderIntroSlide();
+});
+
+// ============================================================
+// WORLD SELECT (karty)
+// ============================================================
+function renderWorldSelect(){
+  const d=ld();
+  // Streak
+  const today=new Date().toISOString().slice(0,10),yest=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  const sa=d.streak.d===today||d.streak.d===yest;
+  if(sa&&d.streak.c>0){$('stk').style.display='flex';$('stk').textContent='\u{1F525} '+d.streak.c;}else $('stk').style.display='none';
+
+  // Mascot msg
+  if(d.done)$('mapMsg').textContent='Všetci sú v bezpečí! Môžeš hrať znova.';
+  else if(d.stats.g===0)$('mapMsg').textContent='Vyber si svet a poďme hľadať!';
+  else $('mapMsg').textContent='Kam pôjdeme dnes, Sárka?';
+
+  const cards=$('worldCards');cards.innerHTML='';
+  WORLDS.forEach((w,i)=>{
+    const unlocked=wUnlocked(d,i);
+    const mp=d.worlds[i].mp;
+    const done=mp[0]&&mp[1]&&mp[2];
+    const lvsDone=d.worlds[i].levels.filter(l=>l&&l.stars>0).length;
+    const lvsTotal=w.levels.filter(l=>typeof l!=='string').length;
+
+    const card=document.createElement('div');
+    card.className='world-card '+w.color+'c'+(unlocked?'':' locked');
+    card.innerHTML=`
+      <div class="wc-icon">${w.icon}</div>
+      <div class="wc-info">
+        <div class="wc-name">${w.name}</div>
+        <div class="wc-desc">${done?'Hotové!':unlocked?w.mascotName+' hľadá...':'Zamknuté'}</div>
+        <div class="wc-progress">${mp.map(p=>'<div class="wc-pip'+(p?' filled':'')+'"></div>').join('')}</div>
+      </div>
+      <img src="${w.mascot}" class="wc-mascot" alt="">
+      ${unlocked?'':'<div class="wc-lock">\u{1F512}</div>'}
+    `;
+    if(unlocked)card.addEventListener('click',()=>{curW=i;ss('worldScr');renderWorldDetail(i);});
+    cards.appendChild(card);
+  });
+}
+
+// ============================================================
+// WORLD DETAIL (levels inside a world)
+// ============================================================
+$('backBtn').addEventListener('click',()=>{ss('mapScr');renderWorldSelect();});
 
 // RESET
 if(location.search.includes('reset')){localStorage.removeItem(SK);history.replaceState(null,'',location.pathname);}
 
 // INIT
-renderMap(0);
+showIntro();
 </script>
 </body>
 </html>
