@@ -259,6 +259,50 @@
     .match-item.selected { border-color: var(--purple); background: var(--purple-light); }
     .match-item.matched { border-color: var(--green); background: #c8f7c5; opacity: 0.6; pointer-events: none; }
 
+    /* Select All (multi-select math cards) */
+    .selectall-target { font-size: 64px; font-weight: 900; color: var(--purple); margin-bottom: 20px; }
+    .selectall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .selectall-card {
+      padding: 18px 12px; border-radius: 16px; border: 3px solid var(--purple-light); background: var(--white);
+      font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; color: var(--purple); cursor: pointer;
+      text-align: center; transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
+    }
+    .selectall-card:hover { transform: scale(1.03); }
+    .selectall-card:active { transform: scale(0.97); }
+    .selectall-card.selected { background: var(--purple-light); border-color: var(--purple); }
+    .selectall-card.correct { background: #c8f7c5; border-color: var(--green); color: #2e7d32; }
+    .selectall-card.wrong { background: #fdd; border-color: var(--red); color: #c62828; }
+    .btn-check { background: var(--purple); color: var(--white); padding: 14px 36px; border-radius: 100px; font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; cursor: pointer; border: none; margin-top: 8px; transition: transform 0.15s ease, opacity 0.15s ease; -webkit-tap-highlight-color: transparent; }
+    .btn-check:hover { transform: scale(1.03); }
+    .btn-check:active { transform: scale(0.97); }
+    .btn-check:disabled { opacity: 0.4; pointer-events: none; }
+
+    /* Number Line slider */
+    .numline-problem { font-size: 48px; font-weight: 800; color: var(--purple); margin-bottom: 24px; }
+    .numline-problem .answer-box {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 56px; height: 56px; border-radius: 12px;
+      background: var(--purple-light); color: var(--purple); margin-left: 4px;
+    }
+    .numline-wrap { position: relative; width: 100%; max-width: 400px; margin: 0 auto 12px; padding: 30px 20px 50px; }
+    .numline-track { width: 100%; height: 6px; background: var(--purple-light); border-radius: 100px; position: relative; }
+    .numline-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--purple-mid); }
+    .numline-ticks { display: flex; justify-content: space-between; position: absolute; top: -4px; left: 0; right: 0; pointer-events: none; }
+    .numline-tick { width: 2px; height: 14px; background: var(--purple-light); border-radius: 2px; }
+    .numline-thumb {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--purple);
+      position: absolute; top: -17px; left: 0; cursor: grab;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 800; font-size: 16px;
+      box-shadow: 0 4px 12px rgba(61,45,121,0.3);
+      transition: background 0.15s ease;
+      touch-action: none; user-select: none; -webkit-user-select: none;
+    }
+    .numline-thumb:active { cursor: grabbing; background: var(--purple-mid); }
+    .numline-thumb.correct-pos { background: var(--green); }
+    .numline-thumb.wrong-pos { background: var(--red); }
+
     /* Speaker */
     .speaker-btn {
       width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--purple-light); background: var(--white);
@@ -421,6 +465,22 @@
         <div id="compareContent" style="display:none;">
           <div class="compare-display" id="compareDisplay"></div>
           <div class="compare-options" id="compareOptions"></div>
+        </div>
+        <div id="selectAllContent" style="display:none;">
+          <div class="selectall-target" id="selectAllTarget"></div>
+          <div class="selectall-grid" id="selectAllGrid"></div>
+          <button class="btn-check" id="selectAllCheck" disabled>Skontrolovať</button>
+        </div>
+        <div id="numlineContent" style="display:none;">
+          <div class="numline-problem" id="numlineProblem"></div>
+          <div class="numline-wrap" id="numlineWrap">
+            <div class="numline-track" id="numlineTrack">
+              <div class="numline-ticks" id="numlineTicks"></div>
+              <div class="numline-thumb" id="numlineThumb">0</div>
+            </div>
+            <div class="numline-labels"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div>
+          </div>
+          <button class="btn-check" id="numlineCheck">Skontrolovať</button>
         </div>
 
         <div class="feedback" id="feedback"></div>
@@ -800,7 +860,7 @@ function speak(text) {
 // ============================================================
 function generateRounds() {
   const rounds = [];
-  const types = ['picture','math','dictation','syllable','match','trueFalse','compare'];
+  const types = ['picture','math','dictation','syllable','match','trueFalse','compare','selectAll','numline'];
   // Distribute: ensure variety
   const pool = [];
   for (let i = 0; i < ROUNDS_PER_GAME; i++) pool.push(types[i % types.length]);
@@ -820,6 +880,8 @@ function generateRounds() {
     else if (type === 'match') rounds.push({ type, data: genMatch() });
     else if (type === 'trueFalse') rounds.push({ type, data: genTF() });
     else if (type === 'compare') rounds.push({ type, data: genCompare() });
+    else if (type === 'selectAll') rounds.push({ type, data: genSelectAll() });
+    else if (type === 'numline') rounds.push({ type, data: genNumline() });
   }
   return rounds;
 }
@@ -859,6 +921,56 @@ function genCompare() {
   const a = randInt(0, 10), b = randInt(0, 10);
   const answer = a > b ? '>' : a < b ? '<' : '=';
   return { a, b, answer };
+}
+
+function genSelectAll() {
+  const target = randInt(2, 10);
+  const cards = [];
+  // Generate 2-3 correct expressions
+  const correctCount = randInt(2, 3);
+  const usedExprs = new Set();
+
+  for (let i = 0; i < correctCount; i++) {
+    let a, b, expr;
+    do {
+      a = randInt(0, target);
+      b = target - a;
+      expr = `${a} + ${b}`;
+    } while (usedExprs.has(expr));
+    usedExprs.add(expr);
+    cards.push({ expr, value: target, correct: true });
+  }
+
+  // Fill rest with wrong expressions
+  while (cards.length < 4) {
+    let a, b, val, expr;
+    do {
+      a = randInt(0, 10);
+      b = randInt(0, 10 - a);
+      val = a + b;
+      expr = `${a} + ${b}`;
+    } while (val === target || usedExprs.has(expr));
+    usedExprs.add(expr);
+    cards.push({ expr, value: val, correct: false });
+  }
+
+  return { target, cards: shuffle(cards) };
+}
+
+function genNumline() {
+  // Simple addition or subtraction, answer 0-10
+  const isAdd = Math.random() > 0.4;
+  let a, b, answer, display;
+  if (isAdd) {
+    a = randInt(1, 8); b = randInt(1, 10 - a);
+    answer = a + b;
+    display = `${a} + ${b} = `;
+  } else {
+    a = randInt(2, 10); b = randInt(1, a);
+    answer = a - b;
+    display = `${a} \u{2212} ${b} = `;
+  }
+  return { display, answer };
 }
 
 // ============================================================
@@ -918,12 +1030,12 @@ function loadRound() {
   $('progressText').textContent = retryMode
     ? `Opakujem ${roundIndex - ROUNDS_PER_GAME + 1} / ${total - ROUNDS_PER_GAME}`
     : `${roundIndex + 1} / ${ROUNDS_PER_GAME}`;
-  ['pictureContent','mathContent','dictationContent','syllableContent','matchContent','tfContent','compareContent'].forEach(id => $(id).style.display = 'none');
+  ['pictureContent','mathContent','dictationContent','syllableContent','matchContent','tfContent','compareContent','selectAllContent','numlineContent'].forEach(id => $(id).style.display = 'none');
   $('feedback').textContent = ''; $('feedback').className = 'feedback';
   $('nextBtn').style.display = 'none'; $('skipBtn').style.display = 'inline-block';
   mascotReact('breathe');
 
-  const loaders = { picture: loadPicture, math: loadMath, dictation: loadDictation, syllable: loadSyllable, match: loadMatch, trueFalse: loadTF, compare: loadCompare };
+  const loaders = { picture: loadPicture, math: loadMath, dictation: loadDictation, syllable: loadSyllable, match: loadMatch, trueFalse: loadTF, compare: loadCompare, selectAll: loadSelectAll, numline: loadNumline };
   loaders[currentRound.type]();
 }
 
@@ -1098,6 +1210,119 @@ function loadCompare() {
   });
 }
 
+// === SELECT ALL ===
+function loadSelectAll() {
+  const d = currentRound.data;
+  $('gameTypeLabel').textContent = '\u{2705} Vyber všetky';
+  $('gameTitle').textContent = 'Vyber všetky správne!';
+  $('gameInstruction').textContent = 'Ktoré príklady sa rovnajú číslu?';
+  $('selectAllTarget').textContent = d.target;
+  $('selectAllContent').style.display = 'block';
+  $('selectAllCheck').disabled = true;
+
+  const grid = $('selectAllGrid'); grid.innerHTML = '';
+  const selected = new Set();
+
+  d.cards.forEach((card, i) => {
+    const el = document.createElement('div'); el.className = 'selectall-card'; el.textContent = card.expr;
+    el.addEventListener('click', () => {
+      if (answered) return;
+      playSound('click');
+      if (selected.has(i)) { selected.delete(i); el.classList.remove('selected'); }
+      else { selected.add(i); el.classList.add('selected'); }
+      $('selectAllCheck').disabled = selected.size === 0;
+    });
+    grid.appendChild(el);
+  });
+
+  $('selectAllCheck').onclick = () => {
+    if (answered) return;
+    const cards = grid.querySelectorAll('.selectall-card');
+    let allCorrect = true;
+
+    d.cards.forEach((card, i) => {
+      const isSelected = selected.has(i);
+      if (card.correct && isSelected) cards[i].classList.add('correct');
+      else if (card.correct && !isSelected) { cards[i].classList.add('correct'); allCorrect = false; }
+      else if (!card.correct && isSelected) { cards[i].classList.add('wrong'); allCorrect = false; }
+    });
+
+    if (allCorrect) onCorrect();
+    else onWrongFinal();
+  };
+}
+
+// === NUMBER LINE ===
+function loadNumline() {
+  const d = currentRound.data;
+  $('gameTypeLabel').textContent = '\u{1F4CF} Číselná os';
+  $('gameTitle').textContent = 'Označ na osi!';
+  $('gameInstruction').textContent = 'Posuň bodku na správne číslo.';
+  $('numlineProblem').innerHTML = d.display + '<span class="answer-box" id="numlineAnswer">?</span>';
+  $('numlineContent').style.display = 'block';
+
+  const track = $('numlineTrack');
+  const thumb = $('numlineThumb');
+  const wrap = $('numlineWrap');
+  thumb.className = 'numline-thumb';
+  thumb.textContent = '0';
+  thumb.style.left = '0px';
+
+  // Build ticks
+  const ticks = $('numlineTicks'); ticks.innerHTML = '';
+  for (let i = 0; i <= 10; i++) {
+    const tick = document.createElement('div'); tick.className = 'numline-tick';
+    ticks.appendChild(tick);
+  }
+
+  let currentVal = 0;
+
+  function updateThumb(clientX) {
+    const rect = track.getBoundingClientRect();
+    let pct = (clientX - rect.left) / rect.width;
+    pct = Math.max(0, Math.min(1, pct));
+    // Snap to nearest integer
+    currentVal = Math.round(pct * 10);
+    const snappedPct = currentVal / 10;
+    thumb.style.left = `calc(${snappedPct * 100}% - 20px)`;
+    thumb.textContent = currentVal;
+    $('numlineAnswer').textContent = currentVal;
+  }
+
+  // Mouse drag
+  thumb.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const onMove = (e2) => updateThumb(e2.clientX);
+    const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // Touch drag
+  thumb.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const onMove = (e2) => updateThumb(e2.touches[0].clientX);
+    const onEnd = () => { document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd); };
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+  });
+
+  // Tap on track
+  track.addEventListener('click', (e) => { if (!answered) updateThumb(e.clientX); });
+
+  $('numlineCheck').onclick = () => {
+    if (answered) return;
+    if (currentVal === d.answer) {
+      thumb.classList.add('correct-pos');
+      onCorrect();
+    } else {
+      thumb.classList.add('wrong-pos');
+      setTimeout(() => thumb.classList.remove('wrong-pos'), 500);
+      onWrongFinal();
+    }
+  };
+}
+
 $('speakerBtn').addEventListener('click', () => { if (currentRound?.type === 'dictation') speak(currentRound.data.word); });
 
 // ============================================================
@@ -1120,6 +1345,8 @@ function getCorrectAnswer() {
   if (r.type === 'trueFalse') return r.data.correct ? '\u{2705} Áno' : '\u{274C} Nie';
   if (r.type === 'syllable') return r.data.word;
   if (r.type === 'match') return '';
+  if (r.type === 'selectAll') return r.data.target;
+  if (r.type === 'numline') return r.data.answer;
   return r.data.word || '';
 }
 
