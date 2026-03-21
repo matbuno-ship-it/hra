@@ -634,7 +634,7 @@ function mascotReact(type) {
 }
 
 // ============================================================
-// TTS
+// TTS – Google Translate (prirodzený hlas) + fallback Web Speech
 // ============================================================
 let skVoice = null;
 function initVoices() {
@@ -643,7 +643,9 @@ function initVoices() {
   skVoice = v.find(x=>x.lang==='sk-SK'&&x.name.includes('Microsoft')) || v.find(x=>x.lang==='sk-SK'&&x.name.includes('Google'))
     || v.find(x=>x.lang==='sk-SK') || v.find(x=>x.lang.startsWith('sk')) || v.find(x=>x.lang==='cs-CZ') || v.find(x=>x.lang.startsWith('cs')) || null;
 }
-function speak(text) {
+if ('speechSynthesis' in window) { initVoices(); speechSynthesis.onvoiceschanged = initVoices; }
+
+function speakFallback(text) {
   if (!('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
   const btn = $('speakerBtn'); btn.classList.add('playing');
@@ -657,7 +659,41 @@ function speak(text) {
   u1.onerror = () => btn.classList.remove('playing');
   speechSynthesis.speak(u1);
 }
-if ('speechSynthesis' in window) { initVoices(); speechSynthesis.onvoiceschanged = initVoices; }
+
+function speak(text) {
+  const word = text.toLowerCase();
+  const btn = $('speakerBtn');
+  btn.classList.add('playing');
+
+  // Google Translate TTS – natural voice
+  const url = 'https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q=' + encodeURIComponent(word);
+
+  const audio = new Audio();
+  audio.crossOrigin = 'anonymous';
+
+  audio.oncanplaythrough = () => {
+    audio.play().catch(() => { speakFallback(text); });
+  };
+
+  audio.onended = () => {
+    // Play again slower (by re-fetching, can't change playbackRate reliably on all browsers)
+    setTimeout(() => {
+      const audio2 = new Audio();
+      audio2.crossOrigin = 'anonymous';
+      audio2.src = url;
+      audio2.onended = () => btn.classList.remove('playing');
+      audio2.onerror = () => btn.classList.remove('playing');
+      audio2.play().catch(() => btn.classList.remove('playing'));
+    }, 600);
+  };
+
+  audio.onerror = () => {
+    // Fallback to Web Speech API
+    speakFallback(text);
+  };
+
+  audio.src = url;
+}
 
 // ============================================================
 // GENERATE ROUNDS (7 types)
