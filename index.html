@@ -227,7 +227,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 </div>
 <div class="wrap">
 <nav>
-<span class="logo">Sárkina Hra</span>
+<img src="lili-icon.svg" alt="" style="width:32px;height:32px"> <span class="logo">Sárkina Hra</span>
 <div class="streak" id="stk" style="display:none"></div>
 <div class="score-pill" id="scr" style="display:none">&#11088; <span id="scrV">0</span></div>
 </nav>
@@ -236,7 +236,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <div class="screen active" id="introScr">
 <div class="intro-slide" id="introSlide"></div>
 <div class="intro-dots" id="introDots"></div>
-<button class="btn btn-b" id="introBtn">Dalej</button>
+<button class="btn btn-b" id="introBtn">Ďalej</button>
 </div>
 
 <!-- WORLD SELECT -->
@@ -247,7 +247,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 
 <!-- WORLD DETAIL (levels) -->
 <div class="screen" id="worldScr">
-<button class="back-btn" id="backBtn">&larr; Spat</button>
+<button class="back-btn" id="backBtn">&larr; Späť</button>
 <div class="world-title" id="wTitle"></div>
 <div class="world-sub" id="wSub"></div>
 <div class="map-pieces" id="mapPcs"></div>
@@ -274,14 +274,14 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <div id="cMatch" style="display:none"><div class="mg" id="matchG"></div></div>
 <div id="cTF" style="display:none"><div class="tfd" id="tfE"></div><div class="tfw" id="tfW"></div><div class="tfo" id="tfO"></div></div>
 <div id="cCmp" style="display:none"><div class="cmpd" id="cmpD"></div><div class="cmpo" id="cmpO"></div></div>
-<div id="cSA" style="display:none"><div class="sat" id="saT"></div><div class="sag" id="saG"></div><button class="ckb" id="saCk" disabled>Skontrolovat</button></div>
-<div id="cNL" style="display:none"><div class="nlp" id="nlP"></div><div class="nlw"><div class="nlt" id="nlTr"><div class="nlti" id="nlTi"></div><div class="nlth" id="nlTh">0</div></div><div class="nll"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div></div><button class="ckb" id="nlCk">Skontrolovat</button></div>
+<div id="cSA" style="display:none"><div class="sat" id="saT"></div><div class="sag" id="saG"></div><button class="ckb" id="saCk" disabled>Skontrolovať</button></div>
+<div id="cNL" style="display:none"><div class="nlp" id="nlP"></div><div class="nlw"><div class="nlt" id="nlTr"><div class="nlti" id="nlTi"></div><div class="nlth" id="nlTh">0</div></div><div class="nll"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div></div><button class="ckb" id="nlCk">Skontrolovať</button></div>
 <div id="cRS" style="display:none"><div class="rs" id="rsS"></div><div class="ro" id="rsO"></div></div>
 <div id="cFW" style="display:none"><div class="fs" id="fwS"></div><div class="flo" id="fwO"></div></div>
 <div id="cOW" style="display:none"><div class="orr" id="owR"></div><div class="oro" id="owO"></div></div>
 <div class="fb" id="fb"></div>
 <button class="skb" id="skB">Neviem</button>
-<button class="btn btn-m" id="nxB" style="display:none">Dalej &#10145;</button>
+<button class="btn btn-m" id="nxB" style="display:none">Ďalej &#10145;</button>
 </div>
 </div>
 
@@ -290,20 +290,20 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <div class="mc"><img src="2.png" id="resImg" alt="" class=""><div class="bub"><span class="nm" id="resNm">Lili</span><span id="resMsg"></span></div></div>
 <div class="stars" id="resStars"></div>
 <p id="resTxt"></p>
-<button class="btn btn-b" id="resBack">Spat na mapu</button>
+<button class="btn btn-b" id="resBack">Späť na mapu</button>
 </div>
 
 <!-- FINALE -->
 <div class="screen" id="finScr">
 <div class="finale">
 <div class="chars">\u{1F43B}\u{1F98C}\u{1F43A}\u{1F98C}</div>
-<h2>Nasli sme ich!</h2>
+<h2>Našli sme ich!</h2>
 <p id="finMsg"></p>
-<button class="btn btn-b" id="finBtn">Huraaaa!</button>
+<button class="btn btn-b" id="finBtn">Hurááá!</button>
 </div>
 </div>
 
-<footer>&copy; 2026 Sarkina Hra</footer>
+<footer>&copy; 2026 Sárkina Hra</footer>
 </div>
 
 <script>
@@ -390,8 +390,38 @@ function acf(){cx.clearRect(0,0,cc.width,cc.height);cp.forEach(p=>{p.x+=p.vx;p.y
 let skV=null;
 function initV(){if(!('speechSynthesis' in window))return;const v=speechSynthesis.getVoices();skV=v.find(x=>x.lang==='sk-SK'&&x.name.includes('Microsoft'))||v.find(x=>x.lang==='sk-SK')||v.find(x=>x.lang.startsWith('sk'))||v.find(x=>x.lang.startsWith('cs'))||null;}
 if('speechSynthesis' in window){initV();speechSynthesis.onvoiceschanged=initV;}
-function spk(text){const w=text.toLowerCase(),btn=$('spkBtn');if(btn)btn.classList.add('playing');const url='https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q='+encodeURIComponent(w);const a=new Audio();a.crossOrigin='anonymous';a.oncanplaythrough=()=>a.play().catch(()=>spkFB(text));a.onended=()=>setTimeout(()=>{const a2=new Audio();a2.crossOrigin='anonymous';a2.src=url;a2.onended=()=>{if(btn)btn.classList.remove('playing');};a2.onerror=()=>{if(btn)btn.classList.remove('playing');};a2.play().catch(()=>{if(btn)btn.classList.remove('playing');});},400);a.onerror=()=>spkFB(text);a.src=url;}
-function spkFB(text){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const btn=$('spkBtn');if(btn)btn.classList.add('playing');const u=new SpeechSynthesisUtterance(text.toLowerCase());if(skV){u.voice=skV;u.lang=skV.lang;}else u.lang='sk-SK';u.rate=.6;u.pitch=1.05;u.onend=()=>{if(btn)btn.classList.remove('playing');};u.onerror=()=>{if(btn)btn.classList.remove('playing');};speechSynthesis.speak(u);}
+function spk(text){
+  const w=text.toLowerCase(),btn=$('spkBtn');
+  if(btn)btn.classList.add('playing');
+  // Try Google TTS first
+  const url='https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q='+encodeURIComponent(w);
+  const a=new Audio(url);
+  let played=false;
+  a.oncanplaythrough=()=>{if(!played){played=true;a.play().catch(()=>spkFB(text));}};
+  a.onended=()=>{
+    setTimeout(()=>{
+      const a2=new Audio(url);
+      a2.onended=()=>{if(btn)btn.classList.remove('playing');};
+      a2.onerror=()=>{if(btn)btn.classList.remove('playing');};
+      a2.play().catch(()=>{if(btn)btn.classList.remove('playing');});
+    },400);
+  };
+  a.onerror=()=>spkFB(text);
+  // Timeout fallback – if nothing plays in 3s, use speech synthesis
+  setTimeout(()=>{if(!played){played=true;spkFB(text);}},3000);
+}
+function spkFB(text){
+  const btn=$('spkBtn');
+  if(!('speechSynthesis' in window)){if(btn)btn.classList.remove('playing');return;}
+  speechSynthesis.cancel();
+  if(btn)btn.classList.add('playing');
+  const u=new SpeechSynthesisUtterance(text.toLowerCase());
+  if(skV){u.voice=skV;u.lang=skV.lang;}else u.lang='sk-SK';
+  u.rate=.6;u.pitch=1.05;
+  u.onend=()=>{if(btn)btn.classList.remove('playing');};
+  u.onerror=()=>{if(btn)btn.classList.remove('playing');};
+  speechSynthesis.speak(u);
+}
 
 // ============================================================
 // MAP RENDERING

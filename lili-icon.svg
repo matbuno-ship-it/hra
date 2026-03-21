@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Lili vlčica - fialová s leopardími škvrnami -->
+  <defs>
+    <radialGradient id="lg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#b8a5e0"/>
+      <stop offset="100%" stop-color="#7b68ae"/>
+    </radialGradient>
+  </defs>
+  <!-- Telo -->
+  <ellipse cx="50" cy="62" rx="28" ry="24" fill="url(#lg)"/>
+  <!-- Hlava -->
+  <circle cx="50" cy="38" r="22" fill="url(#lg)"/>
+  <!-- Uši -->
+  <path d="M32 28 Q28 10 38 22" fill="#9b87cc" stroke="#7b68ae" stroke-width="1"/>
+  <path d="M68 28 Q72 10 62 22" fill="#9b87cc" stroke="#7b68ae" stroke-width="1"/>
+  <path d="M34 26 Q31 14 39 23" fill="#d4b5f7"/>
+  <path d="M66 26 Q69 14 61 23" fill="#d4b5f7"/>
+  <!-- Oči -->
+  <ellipse cx="42" cy="36" rx="5" ry="5.5" fill="white"/>
+  <ellipse cx="58" cy="36" rx="5" ry="5.5" fill="white"/>
+  <circle cx="43" cy="35.5" r="3" fill="#3d2d79"/>
+  <circle cx="59" cy="35.5" r="3" fill="#3d2d79"/>
+  <circle cx="44" cy="34.5" r="1.2" fill="white"/>
+  <circle cx="60" cy="34.5" r="1.2" fill="white"/>
+  <!-- Nos -->
+  <ellipse cx="50" cy="43" rx="3.5" ry="2.5" fill="#6b5ba7"/>
+  <!-- Úsmev -->
+  <path d="M45 46 Q50 51 55 46" stroke="#6b5ba7" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Škvrny -->
+  <circle cx="36" cy="55" r="3" fill="#7b68ae" opacity=".4"/>
+  <circle cx="62" cy="52" r="2.5" fill="#7b68ae" opacity=".4"/>
+  <circle cx="45" cy="70" r="2.5" fill="#7b68ae" opacity=".4"/>
+  <circle cx="58" cy="68" r="3" fill="#7b68ae" opacity=".4"/>
+  <circle cx="38" cy="32" r="2" fill="#7b68ae" opacity=".3"/>
+  <circle cx="60" cy="30" r="1.5" fill="#7b68ae" opacity=".3"/>
+  <!-- Labky -->
+  <ellipse cx="38" cy="82" rx="6" ry="4" fill="#9b87cc"/>
+  <ellipse cx="62" cy="82" rx="6" ry="4" fill="#9b87cc"/>
+  <!-- Chvost -->
+  <path d="M72 65 Q85 55 78 48" stroke="#9b87cc" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>
