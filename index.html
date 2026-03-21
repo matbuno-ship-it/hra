@@ -304,6 +304,24 @@
       color: transparent;
       caret-color: transparent;
       z-index: 2;
+      /* Make sure it's tappable on tablet */
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
+    }
+
+    .typing-area::after {
+      content: '⌨ Ťukni sem pre klávesnicu';
+      display: block;
+      font-size: 15px;
+      color: var(--purple-mid);
+      opacity: 0.5;
+      margin-top: 10px;
+      pointer-events: none;
+    }
+
+    .typing-area.has-focus::after {
+      display: none;
     }
 
     /* === MATH GAME === */
@@ -833,6 +851,9 @@ function updateTypingDisplay(displayId, word, typed) {
 // ============================================================
 // NATIVE INPUT HANDLING (for tablet keyboard)
 // ============================================================
+// Pending focus – otvorí klávesnicu pri najbližšom užívateľskom geste
+let pendingFocusId = null;
+
 function setupNativeInput(inputId, displayId, tapHintId) {
   const input = $(inputId);
   activeInputId = inputId;
@@ -841,22 +862,24 @@ function setupNativeInput(inputId, displayId, tapHintId) {
   input.value = '';
   input.maxLength = targetWord.length;
 
-  // Focus input to open tablet keyboard
-  setTimeout(() => input.focus(), 300);
+  // Mark that we want to focus this input
+  pendingFocusId = inputId;
+
+  // Try direct focus (works if called from user gesture chain)
+  input.readOnly = false;
+  input.focus();
+  input.click();
 
   // Handle input changes
   input.oninput = () => {
     if (answered) return;
     const val = input.value.toUpperCase();
     typedChars = [...val].slice(0, targetWord.length);
-    // Keep input in sync
     input.value = typedChars.join('');
     updateTypingDisplay(displayId, targetWord, typedChars);
 
-    // Hide tap hint once they start typing
     if (tapHintId) $(tapHintId).style.display = 'none';
 
-    // Check answer when fully typed
     if (typedChars.length === targetWord.length) {
       const typed = typedChars.join('');
       if (typed === targetWord) {
@@ -877,12 +900,28 @@ function setupNativeInput(inputId, displayId, tapHintId) {
       }
     }
   };
-
-  // Tap on typing area focuses input
-  $(displayId).parentElement.addEventListener('click', () => {
-    if (!answered) input.focus();
-  });
 }
+
+// Tap anywhere on game card opens keyboard if needed
+document.addEventListener('click', (e) => {
+  if (pendingFocusId && !answered) {
+    const input = $(pendingFocusId);
+    if (input && document.activeElement !== input) {
+      input.focus();
+      input.click();
+    }
+  }
+});
+
+// Show/hide keyboard hint based on focus
+['picInput', 'dictInput'].forEach(id => {
+  $(id).addEventListener('focus', () => {
+    $(id).closest('.typing-area').classList.add('has-focus');
+  });
+  $(id).addEventListener('blur', () => {
+    $(id).closest('.typing-area').classList.remove('has-focus');
+  });
+});
 
 // ============================================================
 // TTS – Google Translate TTS (pekný slovenský hlas)
@@ -1081,7 +1120,14 @@ $('skipBtn').addEventListener('click', onSkip);
 $('nextBtn').addEventListener('click', () => {
   roundIndex++;
   if (roundIndex >= ROUNDS_PER_GAME) showResult();
-  else loadRound();
+  else {
+    loadRound();
+    // Focus input in same gesture chain to trigger tablet keyboard
+    if (pendingFocusId) {
+      const inp = $(pendingFocusId);
+      if (inp) { inp.focus(); inp.click(); }
+    }
+  }
 });
 
 function showResult() {
@@ -1108,8 +1154,20 @@ function showResult() {
 // ============================================================
 // INIT
 // ============================================================
-$('startBtn').addEventListener('click', startGame);
-$('restartBtn').addEventListener('click', startGame);
+$('startBtn').addEventListener('click', () => {
+  startGame();
+  if (pendingFocusId) {
+    const inp = $(pendingFocusId);
+    if (inp) { inp.focus(); inp.click(); }
+  }
+});
+$('restartBtn').addEventListener('click', () => {
+  startGame();
+  if (pendingFocusId) {
+    const inp = $(pendingFocusId);
+    if (inp) { inp.focus(); inp.click(); }
+  }
+});
 </script>
 
 </body>
