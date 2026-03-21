@@ -243,24 +243,12 @@
       line-height: 1;
     }
 
-    .typing-area {
-      position: relative;
-      margin-bottom: 28px;
-      cursor: text;
-    }
-
-    .typing-area .tap-hint {
-      font-size: 14px;
-      color: var(--purple-mid);
-      opacity: 0.6;
-      margin-top: 8px;
-    }
-
     .typing-display {
       font-size: 48px;
       font-weight: 800;
       color: var(--purple);
       letter-spacing: 0.15em;
+      margin-bottom: 20px;
       min-height: 60px;
       display: flex;
       align-items: center;
@@ -291,37 +279,61 @@
       50% { border-color: transparent; }
     }
 
-    .hidden-input {
-      position: absolute;
-      top: 0;
-      left: 0;
+    /* === ON-SCREEN KEYBOARD === */
+    .keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
       width: 100%;
-      height: 100%;
-      opacity: 0;
-      font-size: 48px;
-      border: none;
-      background: none;
-      color: transparent;
-      caret-color: transparent;
-      z-index: 2;
-      /* Make sure it's tappable on tablet */
-      -webkit-appearance: none;
-      appearance: none;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .kb-row {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+
+    .kb-key {
+      min-width: 38px;
+      height: 48px;
+      border-radius: 12px;
+      border: 2px solid var(--purple-light);
+      background: var(--white);
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--purple);
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+      flex: 1;
+      max-width: 48px;
+      padding: 0;
     }
 
-    .typing-area::after {
-      content: '⌨ Ťukni sem pre klávesnicu';
-      display: block;
+    .kb-key:hover {
+      background: var(--purple-light);
+    }
+
+    .kb-key:active {
+      transform: scale(0.93);
+      background: var(--purple-light);
+    }
+
+    .kb-key.wide {
+      max-width: 80px;
       font-size: 15px;
-      color: var(--purple-mid);
-      opacity: 0.5;
-      margin-top: 10px;
-      pointer-events: none;
     }
 
-    .typing-area.has-focus::after {
-      display: none;
+    .kb-key.dia {
+      background: var(--purple-light);
+      border-color: var(--purple-mid);
+      font-size: 16px;
     }
 
     /* === MATH GAME === */
@@ -562,10 +574,14 @@
       .game-instruction { font-size: 14px; margin-bottom: 10px; }
 
       .picture-display { font-size: 60px; min-height: 65px; margin-bottom: 8px; }
-      .typing-display { font-size: 28px; min-height: 36px; }
+      .typing-display { font-size: 28px; min-height: 36px; margin-bottom: 8px; }
       .typing-display .char { width: 30px; height: 36px; border-bottom-width: 3px; }
-      .typing-area .tap-hint { font-size: 12px; margin-top: 4px; }
-      .typing-area::after { font-size: 12px; margin-top: 4px; }
+
+      .keyboard { gap: 4px; }
+      .kb-key { height: 36px; font-size: 14px; min-width: 28px; max-width: 38px; border-radius: 8px; }
+      .kb-key.wide { max-width: 60px; font-size: 12px; }
+      .kb-key.dia { font-size: 13px; }
+      .kb-row { gap: 3px; }
 
       .math-display { font-size: 36px; min-height: 44px; margin-bottom: 10px; }
       .math-display .blank { min-width: 40px; height: 44px; border-bottom-width: 3px; }
@@ -578,24 +594,6 @@
       .btn-medium { padding: 8px 20px; font-size: 15px; }
 
       footer { padding: 6px; font-size: 11px; }
-    }
-
-    /* === Keď je klávesnica otvorená, scrolluj k inputu === */
-    .keyboard-open .game-card {
-      max-height: none;
-    }
-
-    .keyboard-open .bg-animals {
-      display: none;
-    }
-
-    .keyboard-open nav {
-      display: none;
-    }
-
-    .keyboard-open footer {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -648,13 +646,8 @@
       <!-- PICTURE GAME CONTENT -->
       <div id="pictureContent" style="display:none;">
         <div class="picture-display" id="pictureEmoji"></div>
-        <div class="typing-area" id="picTypingArea">
-          <input type="text" class="hidden-input" id="picInput"
-                 autocomplete="off" autocorrect="off" autocapitalize="characters"
-                 spellcheck="false" enterkeyhint="done">
-          <div class="typing-display" id="typingDisplay"></div>
-          <div class="tap-hint" id="picTapHint">Ťukni sem a píš na klávesnici</div>
-        </div>
+        <div class="typing-display" id="typingDisplay"></div>
+        <div class="keyboard" id="keyboard"></div>
       </div>
 
       <!-- MATH GAME CONTENT -->
@@ -667,13 +660,8 @@
       <div id="dictationContent" style="display:none;">
         <button class="speaker-btn" id="speakerBtn">&#128264;</button>
         <p class="game-instruction" id="dictationHint" style="font-size:14px; opacity:0.6;"></p>
-        <div class="typing-area" id="dictTypingArea">
-          <input type="text" class="hidden-input" id="dictInput"
-                 autocomplete="off" autocorrect="off" autocapitalize="characters"
-                 spellcheck="false" enterkeyhint="done">
-          <div class="typing-display" id="dictTypingDisplay"></div>
-          <div class="tap-hint" id="dictTapHint">Ťukni sem a píš na klávesnici</div>
-        </div>
+        <div class="typing-display" id="dictTypingDisplay"></div>
+        <div class="keyboard" id="dictKeyboard"></div>
       </div>
 
       <div class="feedback" id="feedback"></div>
@@ -695,88 +683,46 @@
 </div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
 const ROUNDS_PER_GAME = 12;
 
-// ============================================================
-// PICTURE WORDS – overené Unicode kódy
-// ============================================================
 const PICTURE_WORDS = [
-  { emoji: '\u{1F436}', word: 'PES' },
-  { emoji: '\u{1F431}', word: 'MAČKA' },
-  { emoji: '\u{1F41F}', word: 'RYBA' },
-  { emoji: '\u{1F438}', word: 'ŽABA' },
-  { emoji: '\u{1F410}', word: 'KOZA' },
-  { emoji: '\u{1F426}', word: 'VTÁK' },
-  { emoji: '\u{1F434}', word: 'KÔŇ' },
-  { emoji: '\u{1F430}', word: 'ZAJAC' },
-  { emoji: '\u{1F40D}', word: 'HAD' },
-  { emoji: '\u{1F42D}', word: 'MYŠ' },
-  { emoji: '\u{1F989}', word: 'SOVA' },
-  { emoji: '\u{1F418}', word: 'SLON' },
-  { emoji: '\u{1F981}', word: 'LEV' },
-  { emoji: '\u{1F42E}', word: 'KRAVA' },
-  { emoji: '\u{1F411}', word: 'OVCA' },
-  { emoji: '\u{1F41D}', word: 'VČELA' },
-  { emoji: '\u{1F98B}', word: 'MOTÝĽ' },
-  { emoji: '\u{1F43B}', word: 'MEDVEĎ' },
-  { emoji: '\u{1F98A}', word: 'LÍŠKA' },
-  { emoji: '\u{1F437}', word: 'PRASA' },
-  { emoji: '\u{1F413}', word: 'KOHÚT' },
-  { emoji: '\u{1F43A}', word: 'VLK' },
-  { emoji: '\u{1F41E}', word: 'LIENKA' },
-  { emoji: '\u{1F994}', word: 'JEŽ' },
-  { emoji: '\u{1F43C}', word: 'PANDA' },
-  { emoji: '\u{1F427}', word: 'TUČNIAK' },
-  { emoji: '\u{1F40C}', word: 'SLIMÁK' },
-  { emoji: '\u{1F42C}', word: 'DELFÍN' },
-  { emoji: '\u{1F985}', word: 'OROL' },
-  { emoji: '\u{1F986}', word: 'KAČKA' },
-  { emoji: '\u{1F435}', word: 'OPICA' },
-  { emoji: '\u{1F40A}', word: 'KROKODÍL' },
-  { emoji: '\u{1F422}', word: 'KORYTNAČKA' },
-  { emoji: '\u{1F980}', word: 'KRAB' },
+  { emoji: '\u{1F436}', word: 'PES' },    { emoji: '\u{1F431}', word: 'MAČKA' },
+  { emoji: '\u{1F41F}', word: 'RYBA' },   { emoji: '\u{1F438}', word: 'ŽABA' },
+  { emoji: '\u{1F410}', word: 'KOZA' },   { emoji: '\u{1F426}', word: 'VTÁK' },
+  { emoji: '\u{1F434}', word: 'KÔŇ' },   { emoji: '\u{1F430}', word: 'ZAJAC' },
+  { emoji: '\u{1F40D}', word: 'HAD' },    { emoji: '\u{1F42D}', word: 'MYŠ' },
+  { emoji: '\u{1F989}', word: 'SOVA' },   { emoji: '\u{1F418}', word: 'SLON' },
+  { emoji: '\u{1F981}', word: 'LEV' },    { emoji: '\u{1F42E}', word: 'KRAVA' },
+  { emoji: '\u{1F411}', word: 'OVCA' },   { emoji: '\u{1F41D}', word: 'VČELA' },
+  { emoji: '\u{1F98B}', word: 'MOTÝĽ' },  { emoji: '\u{1F43B}', word: 'MEDVEĎ' },
+  { emoji: '\u{1F98A}', word: 'LÍŠKA' },  { emoji: '\u{1F437}', word: 'PRASA' },
+  { emoji: '\u{1F413}', word: 'KOHÚT' },  { emoji: '\u{1F43A}', word: 'VLK' },
+  { emoji: '\u{1F41E}', word: 'LIENKA' }, { emoji: '\u{1F994}', word: 'JEŽ' },
+  { emoji: '\u{1F43C}', word: 'PANDA' },  { emoji: '\u{1F427}', word: 'TUČNIAK' },
+  { emoji: '\u{1F40C}', word: 'SLIMÁK' }, { emoji: '\u{1F42C}', word: 'DELFÍN' },
+  { emoji: '\u{1F985}', word: 'OROL' },   { emoji: '\u{1F986}', word: 'KAČKA' },
+  { emoji: '\u{1F435}', word: 'OPICA' },  { emoji: '\u{1F40A}', word: 'KROKODÍL' },
+  { emoji: '\u{1F422}', word: 'KORYTNAČKA' }, { emoji: '\u{1F980}', word: 'KRAB' },
   { emoji: '\u{1F414}', word: 'SLIEPKA' },
-  { emoji: '\u{1F3E0}', word: 'DOM' },
-  { emoji: '\u{1F697}', word: 'AUTO' },
-  { emoji: '\u{26BD}', word: 'LOPTA' },
-  { emoji: '\u{1F4D6}', word: 'KNIHA' },
-  { emoji: '\u{1F338}', word: 'KVET' },
-  { emoji: '\u{1F333}', word: 'STROM' },
-  { emoji: '\u{1F4A7}', word: 'VODA' },
-  { emoji: '\u{1F319}', word: 'MESIAC' },
-  { emoji: '\u{2600}\u{FE0F}', word: 'SLNKO' },
-  { emoji: '\u{2B50}', word: 'HVIEZDA' },
-  { emoji: '\u{1F34E}', word: 'JABLKO' },
-  { emoji: '\u{1F511}', word: 'KĽÚČ' },
-  { emoji: '\u{1F382}', word: 'TORTA' },
-  { emoji: '\u{1F9C0}', word: 'SYR' },
-  { emoji: '\u{1F35E}', word: 'CHLIEB' },
-  { emoji: '\u{1F339}', word: 'RUŽA' },
-  { emoji: '\u{1F30A}', word: 'MORE' },
-  { emoji: '\u{1F514}', word: 'ZVON' },
-  { emoji: '\u{1F388}', word: 'BALÓN' },
-  { emoji: '\u{1F9F8}', word: 'MACKO' },
-  { emoji: '\u{2615}', word: 'ČAJ' },
-  { emoji: '\u{1F332}', word: 'LES' },
-  { emoji: '\u{26F0}\u{FE0F}', word: 'HORA' },
-  { emoji: '\u{1F6A2}', word: 'LOĎ' },
-  { emoji: '\u{1F308}', word: 'DÚHA' },
-  { emoji: '\u{1F381}', word: 'DARČEK' },
-  { emoji: '\u{1F451}', word: 'KORUNA' },
-  { emoji: '\u{1F34C}', word: 'BANÁN' },
-  { emoji: '\u{1F392}', word: 'TAŠKA' },
-  { emoji: '\u{1F353}', word: 'JAHODA' },
-  { emoji: '\u{1F347}', word: 'HROZNO' },
-  { emoji: '\u{1F95B}', word: 'MLIEKO' },
+  { emoji: '\u{1F3E0}', word: 'DOM' },    { emoji: '\u{1F697}', word: 'AUTO' },
+  { emoji: '\u{26BD}', word: 'LOPTA' },   { emoji: '\u{1F4D6}', word: 'KNIHA' },
+  { emoji: '\u{1F338}', word: 'KVET' },   { emoji: '\u{1F333}', word: 'STROM' },
+  { emoji: '\u{1F4A7}', word: 'VODA' },   { emoji: '\u{1F319}', word: 'MESIAC' },
+  { emoji: '\u{2600}\u{FE0F}', word: 'SLNKO' }, { emoji: '\u{2B50}', word: 'HVIEZDA' },
+  { emoji: '\u{1F34E}', word: 'JABLKO' }, { emoji: '\u{1F511}', word: 'KĽÚČ' },
+  { emoji: '\u{1F382}', word: 'TORTA' },  { emoji: '\u{1F9C0}', word: 'SYR' },
+  { emoji: '\u{1F35E}', word: 'CHLIEB' }, { emoji: '\u{1F339}', word: 'RUŽA' },
+  { emoji: '\u{1F30A}', word: 'MORE' },   { emoji: '\u{1F514}', word: 'ZVON' },
+  { emoji: '\u{1F388}', word: 'BALÓN' },  { emoji: '\u{1F9F8}', word: 'MACKO' },
+  { emoji: '\u{2615}', word: 'ČAJ' },     { emoji: '\u{1F332}', word: 'LES' },
+  { emoji: '\u{26F0}\u{FE0F}', word: 'HORA' }, { emoji: '\u{1F6A2}', word: 'LOĎ' },
+  { emoji: '\u{1F308}', word: 'DÚHA' },   { emoji: '\u{1F381}', word: 'DARČEK' },
+  { emoji: '\u{1F451}', word: 'KORUNA' }, { emoji: '\u{1F34C}', word: 'BANÁN' },
+  { emoji: '\u{1F392}', word: 'TAŠKA' },  { emoji: '\u{1F353}', word: 'JAHODA' },
+  { emoji: '\u{1F347}', word: 'HROZNO' }, { emoji: '\u{1F95B}', word: 'MLIEKO' },
   { emoji: '\u{270F}\u{FE0F}', word: 'CERUZKA' },
 ];
 
-// ============================================================
-// DICTATION WORDS
-// ============================================================
 const DICTATION_WORDS = [
   'PES', 'DOM', 'HAD', 'MED', 'SYR', 'LEV', 'VLK', 'DUB',
   'LES', 'MYŠ', 'KOŇ', 'SOĽ', 'LOĎ', 'DEŇ', 'KOT', 'JEŽ',
@@ -788,23 +734,10 @@ const DICTATION_WORDS = [
   'SLNKO', 'BANÁN', 'TAŠKA', 'KRAVA', 'PRASA', 'KOHÚT',
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-let totalScore = 0;
-let roundIndex = 0;
-let roundsData = [];
-let currentRound = null;
-let answered = false;
-let typedChars = [];
-let targetWord = '';
-let activeInputId = null; // which input is active (picInput or dictInput)
-
+let totalScore = 0, roundIndex = 0, roundsData = [], currentRound = null;
+let answered = false, typedChars = [], targetWord = '';
 const $ = id => document.getElementById(id);
 
-// ============================================================
-// UTILS
-// ============================================================
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -813,240 +746,189 @@ function shuffle(arr) {
   }
   return a;
 }
-
 function pick(arr, n) { return shuffle(arr).slice(0, n); }
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// ============================================================
-// SCREENS
-// ============================================================
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
 }
 
-// ============================================================
-// GENERATE ROUNDS
-// ============================================================
 function generateRounds() {
-  const rounds = [];
-  const types = [];
+  const rounds = [], types = [];
   for (let i = 0; i < ROUNDS_PER_GAME; i++) types.push(i % 3);
-  const rest = shuffle(types.slice(1));
-  const ordered = [0, ...rest];
-
-  const picWords = pick(PICTURE_WORDS, 6);
-  const dictWords = pick(DICTATION_WORDS, 6);
+  const ordered = [0, ...shuffle(types.slice(1))];
+  const picWords = pick(PICTURE_WORDS, 6), dictWords = pick(DICTATION_WORDS, 6);
   let picIdx = 0, dictIdx = 0;
-
   for (let i = 0; i < ROUNDS_PER_GAME; i++) {
     const type = ordered[i];
-    if (type === 0) {
-      rounds.push({ type: 'picture', data: picWords[picIdx++ % picWords.length] });
-    } else if (type === 1) {
-      rounds.push({ type: 'math', data: generateMathProblem() });
-    } else {
-      rounds.push({ type: 'dictation', data: { word: dictWords[dictIdx++ % dictWords.length] } });
-    }
+    if (type === 0) rounds.push({ type: 'picture', data: picWords[picIdx++ % picWords.length] });
+    else if (type === 1) rounds.push({ type: 'math', data: generateMathProblem() });
+    else rounds.push({ type: 'dictation', data: { word: dictWords[dictIdx++ % dictWords.length] } });
   }
   return rounds;
 }
 
 function generateMathProblem() {
-  const problemType = randInt(0, 4);
-  let a, b, result, display, answer;
-
-  switch (problemType) {
-    case 0:
-      a = randInt(0, 9); b = randInt(0, 10 - a);
-      result = a + b; answer = result;
-      display = `${a} + ${b} = <span class="blank">?</span>`; break;
-    case 1:
-      a = randInt(1, 10); b = randInt(0, a);
-      result = a - b; answer = result;
-      display = `${a} &minus; ${b} = <span class="blank">?</span>`; break;
-    case 2:
-      result = randInt(1, 10); b = randInt(0, result);
-      a = result - b; answer = a;
-      display = `<span class="blank">?</span> + ${b} = ${result}`; break;
-    case 3:
-      result = randInt(1, 10); a = randInt(0, result);
-      b = result - a; answer = b;
-      display = `${a} + <span class="blank">?</span> = ${result}`; break;
-    case 4:
-      a = randInt(1, 10); result = randInt(0, a);
-      b = a - result; answer = b;
-      display = `${a} &minus; <span class="blank">?</span> = ${result}`; break;
+  const t = randInt(0, 4); let a, b, result, display, answer;
+  switch (t) {
+    case 0: a=randInt(0,9); b=randInt(0,10-a); answer=a+b;
+      display=`${a} + ${b} = <span class="blank">?</span>`; break;
+    case 1: a=randInt(1,10); b=randInt(0,a); answer=a-b;
+      display=`${a} &minus; ${b} = <span class="blank">?</span>`; break;
+    case 2: result=randInt(1,10); b=randInt(0,result); answer=result-b;
+      display=`<span class="blank">?</span> + ${b} = ${result}`; break;
+    case 3: result=randInt(1,10); a=randInt(0,result); answer=result-a;
+      display=`${a} + <span class="blank">?</span> = ${result}`; break;
+    case 4: a=randInt(1,10); result=randInt(0,a); answer=a-result;
+      display=`${a} &minus; <span class="blank">?</span> = ${result}`; break;
   }
-
   const opts = new Set([answer]);
-  while (opts.size < 4) {
-    let wrong = answer + randInt(-3, 3);
-    if (wrong < 0 || wrong > 10) wrong = randInt(0, 10);
-    opts.add(wrong);
-  }
+  while (opts.size < 4) { let w = answer+randInt(-3,3); if(w<0||w>10) w=randInt(0,10); opts.add(w); }
   return { display, answer, options: shuffle([...opts]) };
 }
 
 // ============================================================
-// TYPING DISPLAY
+// ON-SCREEN KEYBOARD (s diakritikou)
 // ============================================================
+const KB_ROWS = [
+  ['Q','W','E','R','T','Z','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Y','X','C','V','B','N','M','\u{232B}'],
+];
+const KB_DIA_ROWS = [
+  ['Á','Ä','Č','Ď','É','Í','Ľ','Ň','Ó','Ô'],
+  ['Ŕ','Š','Ť','Ú','Ý','Ž'],
+];
+
+function buildKeyboard(containerId, onKey) {
+  const container = $(containerId);
+  container.innerHTML = '';
+  const needsDia = /[ÁÄČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]/i.test(targetWord);
+
+  KB_ROWS.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'kb-row';
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'kb-key' + (key === '\u{232B}' ? ' wide' : '');
+      btn.textContent = key;
+      btn.addEventListener('click', (e) => { e.preventDefault(); onKey(key); });
+      rowDiv.appendChild(btn);
+    });
+    container.appendChild(rowDiv);
+  });
+
+  if (needsDia) {
+    KB_DIA_ROWS.forEach(row => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'kb-row';
+      row.forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'kb-key dia';
+        btn.textContent = key;
+        btn.addEventListener('click', (e) => { e.preventDefault(); onKey(key); });
+        rowDiv.appendChild(btn);
+      });
+      container.appendChild(rowDiv);
+    });
+  }
+}
+
 function updateTypingDisplay(displayId, word, typed) {
   const container = $(displayId);
   container.innerHTML = '';
   for (let i = 0; i < word.length; i++) {
     const span = document.createElement('span');
     span.className = 'char';
-    if (i < typed.length) {
-      span.textContent = typed[i];
-      span.classList.add('filled');
-    } else if (i === typed.length) {
-      span.classList.add('cursor');
-    }
+    if (i < typed.length) { span.textContent = typed[i]; span.classList.add('filled'); }
+    else if (i === typed.length) { span.classList.add('cursor'); }
     container.appendChild(span);
   }
 }
 
-// ============================================================
-// NATIVE INPUT HANDLING (for tablet keyboard)
-// ============================================================
-// Pending focus – otvorí klávesnicu pri najbližšom užívateľskom geste
-let pendingFocusId = null;
+function handleTyping(key, displayId) {
+  if (answered) return;
+  if (key === '\u{232B}') { typedChars.pop(); }
+  else if (typedChars.length < targetWord.length) { typedChars.push(key); }
+  updateTypingDisplay(displayId, targetWord, typedChars);
 
-function setupNativeInput(inputId, displayId, tapHintId) {
-  const input = $(inputId);
-  activeInputId = inputId;
-
-  // Reset input
-  input.value = '';
-  input.maxLength = targetWord.length;
-
-  // Mark that we want to focus this input
-  pendingFocusId = inputId;
-
-  // Try direct focus (works if called from user gesture chain)
-  input.readOnly = false;
-  input.focus();
-  input.click();
-
-  // Handle input changes
-  input.oninput = () => {
-    if (answered) return;
-    const val = input.value.toUpperCase();
-    typedChars = [...val].slice(0, targetWord.length);
-    input.value = typedChars.join('');
-    updateTypingDisplay(displayId, targetWord, typedChars);
-
-    if (tapHintId) $(tapHintId).style.display = 'none';
-
-    if (typedChars.length === targetWord.length) {
-      const typed = typedChars.join('');
-      if (typed === targetWord) {
-        onCorrect();
-        input.blur();
-      } else {
-        onWrong();
-        setTimeout(() => {
-          if (!answered) {
-            typedChars = [];
-            input.value = '';
-            updateTypingDisplay(displayId, targetWord, typedChars);
-            $('feedback').textContent = '';
-            $('feedback').className = 'feedback';
-            input.focus();
-          }
-        }, 1200);
-      }
-    }
-  };
-}
-
-// Tap anywhere on game card opens keyboard if needed
-document.addEventListener('click', (e) => {
-  if (pendingFocusId && !answered) {
-    const input = $(pendingFocusId);
-    if (input && document.activeElement !== input) {
-      input.focus();
-      input.click();
+  if (typedChars.length === targetWord.length) {
+    if (typedChars.join('') === targetWord) {
+      onCorrect();
+    } else {
+      onWrong();
+      setTimeout(() => {
+        if (!answered) {
+          typedChars = [];
+          updateTypingDisplay(displayId, targetWord, typedChars);
+          $('feedback').textContent = '';
+          $('feedback').className = 'feedback';
+        }
+      }, 1200);
     }
   }
-});
-
-// Show/hide keyboard hint based on focus
-['picInput', 'dictInput'].forEach(id => {
-  $(id).addEventListener('focus', () => {
-    $(id).closest('.typing-area').classList.add('has-focus');
-  });
-  $(id).addEventListener('blur', () => {
-    $(id).closest('.typing-area').classList.remove('has-focus');
-  });
-});
+}
 
 // ============================================================
-// TTS – Web Speech API s najlepším dostupným hlasom
+// TTS – vždy slovenčina, nikdy angličtina
 // ============================================================
-let bestVoice = null;
+let skVoice = null;
 
 function initVoices() {
   if (!('speechSynthesis' in window)) return;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return;
 
-  // Preference: Microsoft Slovak > Google Slovak > any Slovak > Czech > default
-  bestVoice =
-    voices.find(v => v.lang.startsWith('sk') && v.name.includes('Microsoft')) ||
-    voices.find(v => v.lang.startsWith('sk') && v.name.includes('Google')) ||
+  // STRIKTNE len slovenský alebo český hlas – NIKDY anglický
+  skVoice =
+    voices.find(v => v.lang === 'sk-SK' && v.name.includes('Microsoft')) ||
+    voices.find(v => v.lang === 'sk-SK' && v.name.includes('Google')) ||
     voices.find(v => v.lang === 'sk-SK') ||
     voices.find(v => v.lang.startsWith('sk')) ||
-    voices.find(v => v.lang.startsWith('cs') && v.name.includes('Microsoft')) ||
+    voices.find(v => v.lang === 'cs-CZ') ||
     voices.find(v => v.lang.startsWith('cs')) ||
     null;
 
-  console.log('TTS voice:', bestVoice ? bestVoice.name + ' (' + bestVoice.lang + ')' : 'default');
+  console.log('TTS hlas:', skVoice ? skVoice.name + ' [' + skVoice.lang + ']' : 'žiadny SK hlas!');
 }
 
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
 
   const word = text.toLowerCase();
   const btn = $('speakerBtn');
-
-  // Cancel any previous speech
-  window.speechSynthesis.cancel();
-
   btn.classList.add('playing');
 
-  // First utterance – normal speed
-  const u1 = new SpeechSynthesisUtterance(word);
-  u1.lang = 'sk-SK';
-  u1.rate = 0.6;
-  u1.pitch = 1.05;
-  u1.volume = 1;
-  if (bestVoice) u1.voice = bestVoice;
+  function makeUtterance(rate) {
+    const u = new SpeechSynthesisUtterance(word);
+    // KĽÚČOVÉ: nastaviť voice PRED lang, a vždy nastaviť oboje
+    if (skVoice) {
+      u.voice = skVoice;
+      u.lang = skVoice.lang; // použiť lang z nájdeného hlasu
+    } else {
+      u.lang = 'sk-SK';
+    }
+    u.rate = rate;
+    u.pitch = 1.05;
+    u.volume = 1;
+    return u;
+  }
 
+  const u1 = makeUtterance(0.65);
   u1.onend = () => {
-    // Second utterance – slower, after pause
     setTimeout(() => {
-      const u2 = new SpeechSynthesisUtterance(word);
-      u2.lang = 'sk-SK';
-      u2.rate = 0.45;
-      u2.pitch = 1.05;
-      u2.volume = 1;
-      if (bestVoice) u2.voice = bestVoice;
+      const u2 = makeUtterance(0.5);
       u2.onend = () => btn.classList.remove('playing');
       u2.onerror = () => btn.classList.remove('playing');
       window.speechSynthesis.speak(u2);
-    }, 800);
+    }, 700);
   };
-
   u1.onerror = () => btn.classList.remove('playing');
   window.speechSynthesis.speak(u1);
 }
 
-// Init voices (may load async)
 if ('speechSynthesis' in window) {
   initVoices();
   speechSynthesis.onvoiceschanged = initVoices;
@@ -1056,8 +938,7 @@ if ('speechSynthesis' in window) {
 // GAME LOGIC
 // ============================================================
 function startGame() {
-  totalScore = 0;
-  roundIndex = 0;
+  totalScore = 0; roundIndex = 0;
   $('totalScore').textContent = '0';
   $('navScore').style.display = 'flex';
   roundsData = generateRounds();
@@ -1066,12 +947,8 @@ function startGame() {
 }
 
 function loadRound() {
-  answered = false;
-  typedChars = [];
+  answered = false; typedChars = [];
   currentRound = roundsData[roundIndex];
-
-  // Blur any active input
-  if (activeInputId) $(activeInputId).blur();
 
   $('progressFill').style.width = ((roundIndex / ROUNDS_PER_GAME) * 100) + '%';
   $('progressText').textContent = `${roundIndex + 1} / ${ROUNDS_PER_GAME}`;
@@ -1084,192 +961,108 @@ function loadRound() {
   $('nextBtn').style.display = 'none';
   $('skipBtn').style.display = 'inline-block';
 
-  // Reset tap hints
-  $('picTapHint').style.display = 'block';
-  $('dictTapHint').style.display = 'block';
-
   if (currentRound.type === 'picture') loadPictureRound();
   else if (currentRound.type === 'math') loadMathRound();
   else loadDictationRound();
 }
 
-// === PICTURE ROUND ===
 function loadPictureRound() {
-  const data = currentRound.data;
-  $('gameTypeLabel').innerHTML = '\u{1F5BC} Obrázok';
+  $('gameTypeLabel').textContent = '\u{1F5BC} Obrázok';
   $('gameTitle').textContent = 'Čo je na obrázku?';
   $('gameInstruction').textContent = 'Napíš slovo, ktoré vidíš na obrázku.';
-  $('pictureEmoji').textContent = data.emoji;
+  $('pictureEmoji').textContent = currentRound.data.emoji;
   $('pictureContent').style.display = 'block';
-
-  targetWord = data.word;
+  targetWord = currentRound.data.word;
   typedChars = [];
   updateTypingDisplay('typingDisplay', targetWord, typedChars);
-  setupNativeInput('picInput', 'typingDisplay', 'picTapHint');
+  buildKeyboard('keyboard', key => handleTyping(key, 'typingDisplay'));
 }
 
-// === MATH ROUND ===
 function loadMathRound() {
-  const data = currentRound.data;
-  $('gameTypeLabel').innerHTML = '\u{1F522} Matematika';
+  $('gameTypeLabel').textContent = '\u{1F522} Matematika';
   $('gameTitle').textContent = 'Vypočítaj!';
   $('gameInstruction').textContent = 'Vyber správne číslo.';
-  $('mathDisplay').innerHTML = data.display;
+  $('mathDisplay').innerHTML = currentRound.data.display;
   $('mathContent').style.display = 'block';
-
   const container = $('mathOptions');
   container.innerHTML = '';
-  data.options.forEach(opt => {
+  currentRound.data.options.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'math-opt-btn';
     btn.textContent = opt;
-    btn.addEventListener('click', () => handleMathAnswer(opt, btn));
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      if (opt === currentRound.data.answer) { btn.classList.add('correct'); onCorrect(); }
+      else { btn.classList.add('wrong'); btn.disabled = true;
+        $('feedback').textContent = '\u{274C} Skús znova!';
+        $('feedback').className = 'feedback error'; }
+    });
     container.appendChild(btn);
   });
 }
 
-function handleMathAnswer(value, btn) {
-  if (answered) return;
-  if (value === currentRound.data.answer) {
-    btn.classList.add('correct');
-    onCorrect();
-  } else {
-    btn.classList.add('wrong');
-    btn.disabled = true;
-    $('feedback').innerHTML = '\u{274C} Skús znova!';
-    $('feedback').className = 'feedback error';
-  }
-}
-
-// === DICTATION ROUND ===
 function loadDictationRound() {
-  const data = currentRound.data;
-  $('gameTypeLabel').innerHTML = '\u{1F509} Diktát';
+  $('gameTypeLabel').textContent = '\u{1F509} Diktát';
   $('gameTitle').textContent = 'Napíš, čo počuješ';
   $('gameInstruction').textContent = 'Stlač reproduktor a napíš slovo.';
-  $('dictationHint').textContent = `Nápoveda: ${data.word.length} písmen`;
+  $('dictationHint').textContent = `Nápoveda: ${currentRound.data.word.length} písmen`;
   $('dictationContent').style.display = 'block';
-
-  targetWord = data.word;
+  targetWord = currentRound.data.word;
   typedChars = [];
   updateTypingDisplay('dictTypingDisplay', targetWord, typedChars);
-  setupNativeInput('dictInput', 'dictTypingDisplay', 'dictTapHint');
-
-  setTimeout(() => speak(data.word), 500);
+  buildKeyboard('dictKeyboard', key => handleTyping(key, 'dictTypingDisplay'));
+  setTimeout(() => speak(currentRound.data.word), 500);
 }
 
 $('speakerBtn').addEventListener('click', () => {
-  if (currentRound && currentRound.type === 'dictation') {
-    speak(currentRound.data.word);
-  }
+  if (currentRound && currentRound.type === 'dictation') speak(currentRound.data.word);
 });
 
-// ============================================================
-// CORRECT / WRONG / SKIP
-// ============================================================
 function onCorrect() {
-  answered = true;
-  totalScore++;
+  answered = true; totalScore++;
   $('totalScore').textContent = totalScore;
-  $('feedback').innerHTML = '\u{1F389} Výborne, Sárka!';
+  $('feedback').textContent = '\u{1F389} Výborne, Sárka!';
   $('feedback').className = 'feedback success';
   $('nextBtn').style.display = 'inline-block';
   $('skipBtn').style.display = 'none';
-  if (activeInputId) $(activeInputId).blur();
 }
 
 function onWrong() {
-  $('feedback').innerHTML = '\u{274C} Skús to znova!';
+  $('feedback').textContent = '\u{274C} Skús to znova!';
   $('feedback').className = 'feedback error';
 }
 
-function onSkip() {
+$('skipBtn').addEventListener('click', () => {
   answered = true;
   $('skipBtn').style.display = 'none';
-  if (activeInputId) $(activeInputId).blur();
-
-  let answer = '';
-  if (currentRound.type === 'math') answer = currentRound.data.answer;
-  else answer = currentRound.type === 'picture' ? currentRound.data.word : currentRound.data.word;
-
+  const answer = currentRound.type === 'math' ? currentRound.data.answer : (currentRound.data.word || currentRound.data.word);
   $('feedback').innerHTML = `\u{1F4A1} Správna odpoveď: <strong>${answer}</strong>`;
   $('feedback').className = 'feedback error';
   $('nextBtn').style.display = 'inline-block';
-}
+});
 
-$('skipBtn').addEventListener('click', onSkip);
-
-// ============================================================
-// NEXT / RESULT
-// ============================================================
 $('nextBtn').addEventListener('click', () => {
   roundIndex++;
   if (roundIndex >= ROUNDS_PER_GAME) showResult();
-  else {
-    loadRound();
-    // Focus input in same gesture chain to trigger tablet keyboard
-    if (pendingFocusId) {
-      const inp = $(pendingFocusId);
-      if (inp) { inp.focus(); inp.click(); }
-    }
-  }
+  else loadRound();
 });
 
 function showResult() {
   showScreen('resultScreen');
   const pct = totalScore / ROUNDS_PER_GAME;
   let emoji, title, stars;
-
-  if (pct === 1) {
-    emoji = '\u{1F3C6}'; title = 'Perfektné, Sárka!'; stars = '\u{2B50}\u{2B50}\u{2B50}';
-  } else if (pct >= 0.7) {
-    emoji = '\u{1F389}'; title = 'Skvelá práca, Sárka!'; stars = '\u{2B50}\u{2B50}';
-  } else if (pct >= 0.4) {
-    emoji = '\u{1F4AA}'; title = 'Dobre, skúsime znova?'; stars = '\u{2B50}';
-  } else {
-    emoji = '\u{1F60A}'; title = 'Nevadí, cvičíme ďalej!'; stars = '';
-  }
-
+  if (pct === 1) { emoji='\u{1F3C6}'; title='Perfektné, Sárka!'; stars='\u{2B50}\u{2B50}\u{2B50}'; }
+  else if (pct >= 0.7) { emoji='\u{1F389}'; title='Skvelá práca, Sárka!'; stars='\u{2B50}\u{2B50}'; }
+  else if (pct >= 0.4) { emoji='\u{1F4AA}'; title='Dobre, skúsime znova?'; stars='\u{2B50}'; }
+  else { emoji='\u{1F60A}'; title='Nevadí, cvičíme ďalej!'; stars=''; }
   $('resultEmoji').textContent = emoji;
   $('resultTitle').textContent = title;
   $('resultStars').textContent = stars;
   $('resultText').textContent = `Správne: ${totalScore} z ${ROUNDS_PER_GAME}`;
 }
 
-// ============================================================
-// INIT
-// ============================================================
-$('startBtn').addEventListener('click', () => {
-  startGame();
-  if (pendingFocusId) {
-    const inp = $(pendingFocusId);
-    if (inp) { inp.focus(); inp.click(); }
-  }
-});
-$('restartBtn').addEventListener('click', () => {
-  startGame();
-  if (pendingFocusId) {
-    const inp = $(pendingFocusId);
-    if (inp) { inp.focus(); inp.click(); }
-  }
-});
-
-// ============================================================
-// KEYBOARD DETECTION – schovaj nepotrebné veci keď je klávesnica
-// ============================================================
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    // Ak viewport je výrazne menší ako okno = klávesnica je otvorená
-    const keyboardOpen = window.visualViewport.height < window.innerHeight * 0.75;
-    document.body.classList.toggle('keyboard-open', keyboardOpen);
-
-    if (keyboardOpen && activeInputId) {
-      // Scrollni k aktívnemu inputu
-      const el = $(activeInputId).closest('.typing-area');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  });
-}
+$('startBtn').addEventListener('click', startGame);
+$('restartBtn').addEventListener('click', startGame);
 </script>
 
 </body>
