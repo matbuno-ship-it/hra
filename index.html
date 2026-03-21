@@ -279,61 +279,24 @@
       50% { border-color: transparent; }
     }
 
-    /* === ON-SCREEN KEYBOARD === */
-    .keyboard {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-      width: 100%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+    /* === NATIVE KEYBOARD INPUT === */
+    .typing-wrap {
+      position: relative;
+      cursor: text;
     }
 
-    .kb-row {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-    }
-
-    .kb-key {
-      min-width: 38px;
-      height: 48px;
-      border-radius: 12px;
-      border: 2px solid var(--purple-light);
-      background: var(--white);
-      font-family: 'Nunito', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--purple);
-      cursor: pointer;
-      transition: transform 0.1s ease, background 0.1s ease;
-      -webkit-tap-highlight-color: transparent;
+    .typing-input {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      font-size: 48px;
+      border: none;
+      background: none;
+      -webkit-appearance: none;
+      appearance: none;
       touch-action: manipulation;
-      flex: 1;
-      max-width: 48px;
-      padding: 0;
-    }
-
-    .kb-key:hover {
-      background: var(--purple-light);
-    }
-
-    .kb-key:active {
-      transform: scale(0.93);
-      background: var(--purple-light);
-    }
-
-    .kb-key.wide {
-      max-width: 80px;
-      font-size: 15px;
-    }
-
-    .kb-key.dia {
-      background: var(--purple-light);
-      border-color: var(--purple-mid);
-      font-size: 16px;
+      z-index: 2;
     }
 
     /* === MATH GAME === */
@@ -577,12 +540,6 @@
       .typing-display { font-size: 28px; min-height: 36px; margin-bottom: 8px; }
       .typing-display .char { width: 30px; height: 36px; border-bottom-width: 3px; }
 
-      .keyboard { gap: 4px; }
-      .kb-key { height: 36px; font-size: 14px; min-width: 28px; max-width: 38px; border-radius: 8px; }
-      .kb-key.wide { max-width: 60px; font-size: 12px; }
-      .kb-key.dia { font-size: 13px; }
-      .kb-row { gap: 3px; }
-
       .math-display { font-size: 36px; min-height: 44px; margin-bottom: 10px; }
       .math-display .blank { min-width: 40px; height: 44px; border-bottom-width: 3px; }
       .math-opt-btn { width: 56px; height: 56px; font-size: 24px; border-radius: 14px; }
@@ -646,8 +603,11 @@
       <!-- PICTURE GAME CONTENT -->
       <div id="pictureContent" style="display:none;">
         <div class="picture-display" id="pictureEmoji"></div>
-        <div class="typing-display" id="typingDisplay"></div>
-        <div class="keyboard" id="keyboard"></div>
+        <div class="typing-wrap" id="picWrap">
+          <input type="text" class="typing-input" id="picInput"
+                 autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+          <div class="typing-display" id="typingDisplay"></div>
+        </div>
       </div>
 
       <!-- MATH GAME CONTENT -->
@@ -660,8 +620,11 @@
       <div id="dictationContent" style="display:none;">
         <button class="speaker-btn" id="speakerBtn">&#128264;</button>
         <p class="game-instruction" id="dictationHint" style="font-size:14px; opacity:0.6;"></p>
-        <div class="typing-display" id="dictTypingDisplay"></div>
-        <div class="keyboard" id="dictKeyboard"></div>
+        <div class="typing-wrap" id="dictWrap">
+          <input type="text" class="typing-input" id="dictInput"
+                 autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+          <div class="typing-display" id="dictTypingDisplay"></div>
+        </div>
       </div>
 
       <div class="feedback" id="feedback"></div>
@@ -789,50 +752,45 @@ function generateMathProblem() {
 }
 
 // ============================================================
-// ON-SCREEN KEYBOARD (s diakritikou)
+// NATIVE KEYBOARD INPUT
 // ============================================================
-const KB_ROWS = [
-  ['Q','W','E','R','T','Z','U','I','O','P'],
-  ['A','S','D','F','G','H','J','K','L'],
-  ['Y','X','C','V','B','N','M','\u{232B}'],
-];
-const KB_DIA_ROWS = [
-  ['Á','Ä','Č','Ď','É','Í','Ľ','Ň','Ó','Ô'],
-  ['Ŕ','Š','Ť','Ú','Ý','Ž'],
-];
+let activeInput = null;
 
-function buildKeyboard(containerId, onKey) {
-  const container = $(containerId);
-  container.innerHTML = '';
-  const needsDia = /[ÁÄČĎÉÍĽĹŇÓÔŔŠŤÚÝŽ]/i.test(targetWord);
+function setupInput(inputId, displayId) {
+  const input = $(inputId);
+  activeInput = input;
+  input.value = '';
+  input.maxLength = targetWord.length;
 
-  KB_ROWS.forEach(row => {
-    const rowDiv = document.createElement('div');
-    rowDiv.className = 'kb-row';
-    row.forEach(key => {
-      const btn = document.createElement('button');
-      btn.className = 'kb-key' + (key === '\u{232B}' ? ' wide' : '');
-      btn.textContent = key;
-      btn.addEventListener('click', (e) => { e.preventDefault(); onKey(key); });
-      rowDiv.appendChild(btn);
-    });
-    container.appendChild(rowDiv);
-  });
+  input.oninput = () => {
+    if (answered) return;
+    const val = input.value.toUpperCase();
+    typedChars = [...val].slice(0, targetWord.length);
+    input.value = typedChars.join('');
+    updateTypingDisplay(displayId, targetWord, typedChars);
 
-  if (needsDia) {
-    KB_DIA_ROWS.forEach(row => {
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'kb-row';
-      row.forEach(key => {
-        const btn = document.createElement('button');
-        btn.className = 'kb-key dia';
-        btn.textContent = key;
-        btn.addEventListener('click', (e) => { e.preventDefault(); onKey(key); });
-        rowDiv.appendChild(btn);
-      });
-      container.appendChild(rowDiv);
-    });
-  }
+    if (typedChars.length === targetWord.length) {
+      if (typedChars.join('') === targetWord) {
+        onCorrect();
+        input.blur();
+      } else {
+        onWrong();
+        setTimeout(() => {
+          if (!answered) {
+            typedChars = [];
+            input.value = '';
+            updateTypingDisplay(displayId, targetWord, typedChars);
+            $('feedback').textContent = '';
+            $('feedback').className = 'feedback';
+            input.focus();
+          }
+        }, 1200);
+      }
+    }
+  };
+
+  // Focus immediately (works from user gesture chain)
+  input.focus();
 }
 
 function updateTypingDisplay(displayId, word, typed) {
@@ -847,28 +805,13 @@ function updateTypingDisplay(displayId, word, typed) {
   }
 }
 
-function handleTyping(key, displayId) {
-  if (answered) return;
-  if (key === '\u{232B}') { typedChars.pop(); }
-  else if (typedChars.length < targetWord.length) { typedChars.push(key); }
-  updateTypingDisplay(displayId, targetWord, typedChars);
-
-  if (typedChars.length === targetWord.length) {
-    if (typedChars.join('') === targetWord) {
-      onCorrect();
-    } else {
-      onWrong();
-      setTimeout(() => {
-        if (!answered) {
-          typedChars = [];
-          updateTypingDisplay(displayId, targetWord, typedChars);
-          $('feedback').textContent = '';
-          $('feedback').className = 'feedback';
-        }
-      }, 1200);
-    }
+// Tap on typing area focuses input
+document.addEventListener('click', (e) => {
+  const wrap = e.target.closest('.typing-wrap');
+  if (wrap && activeInput && !answered) {
+    activeInput.focus();
   }
-}
+});
 
 // ============================================================
 // TTS – vždy slovenčina, nikdy angličtina
@@ -975,7 +918,7 @@ function loadPictureRound() {
   targetWord = currentRound.data.word;
   typedChars = [];
   updateTypingDisplay('typingDisplay', targetWord, typedChars);
-  buildKeyboard('keyboard', key => handleTyping(key, 'typingDisplay'));
+  setupInput('picInput', 'typingDisplay');
 }
 
 function loadMathRound() {
@@ -1010,7 +953,7 @@ function loadDictationRound() {
   targetWord = currentRound.data.word;
   typedChars = [];
   updateTypingDisplay('dictTypingDisplay', targetWord, typedChars);
-  buildKeyboard('dictKeyboard', key => handleTyping(key, 'dictTypingDisplay'));
+  setupInput('dictInput', 'dictTypingDisplay');
   setTimeout(() => speak(currentRound.data.word), 500);
 }
 
@@ -1025,6 +968,7 @@ function onCorrect() {
   $('feedback').className = 'feedback success';
   $('nextBtn').style.display = 'inline-block';
   $('skipBtn').style.display = 'none';
+  if (activeInput) activeInput.blur();
 }
 
 function onWrong() {
@@ -1035,7 +979,8 @@ function onWrong() {
 $('skipBtn').addEventListener('click', () => {
   answered = true;
   $('skipBtn').style.display = 'none';
-  const answer = currentRound.type === 'math' ? currentRound.data.answer : (currentRound.data.word || currentRound.data.word);
+  if (activeInput) activeInput.blur();
+  const answer = currentRound.type === 'math' ? currentRound.data.answer : currentRound.data.word;
   $('feedback').innerHTML = `\u{1F4A1} Správna odpoveď: <strong>${answer}</strong>`;
   $('feedback').className = 'feedback error';
   $('nextBtn').style.display = 'inline-block';
@@ -1044,7 +989,11 @@ $('skipBtn').addEventListener('click', () => {
 $('nextBtn').addEventListener('click', () => {
   roundIndex++;
   if (roundIndex >= ROUNDS_PER_GAME) showResult();
-  else loadRound();
+  else {
+    loadRound();
+    // Focus in same gesture to open keyboard
+    if (activeInput) activeInput.focus();
+  }
 });
 
 function showResult() {
