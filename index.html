@@ -282,9 +282,9 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <div class="gt-label" id="gLabel"></div>
 <h2 class="gt-title" id="gTitle"></h2>
 <p class="gt-instr" id="gInstr"></p>
-<div id="cPic" style="display:none"><div class="pic-d" id="picE"></div><div class="tw"><input type="text" class="" id="picIn" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><div class="td" id="picTD"></div></div></div>
+<div id="cPic" style="display:none"><div class="pic-d" id="picE"></div><div class="tw"><input type="text" id="picIn" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><div class="td" id="picTD"></div></div></div>
 <div id="cMath" style="display:none"><div class="md" id="mathD"></div><div class="mo" id="mathO"></div></div>
-<div id="cDict" style="display:none"><button class="spk" id="spkBtn">&#128266;</button><p class="gt-instr" id="dictH" style="font-size:12px;opacity:.5"></p><div class="tw"><input type="text" class="" id="dictIn" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><div class="td" id="dictTD"></div></div></div>
+<div id="cDict" style="display:none"><button class="spk" id="spkBtn">&#128266;</button><p style="font-size:13px;color:var(--pmid);margin-bottom:10px">&#9757; Stlač pre prehranie</p><p class="gt-instr" id="dictH" style="font-size:13px;opacity:.5"></p><div class="tw"><input type="text" id="dictIn" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><div class="td" id="dictTD"></div></div></div>
 <div id="cSyl" style="display:none"><div class="sye" id="sylE"></div><div class="syt" id="sylT"></div><div class="syo" id="sylO"></div></div>
 <div id="cMatch" style="display:none"><div class="mg" id="matchG"></div></div>
 <div id="cTF" style="display:none"><div class="tfd" id="tfE"></div><div class="tfw" id="tfW"></div><div class="tfo" id="tfO"></div></div>
@@ -311,7 +311,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <!-- FINALE -->
 <div class="screen" id="finScr">
 <div class="finale">
-<div class="chars">\u{1F43B}\u{1F98C}\u{1F43A}\u{1F98C}</div>
+<div class="chars">\u{1F43A}\u{1F98C}\u{1F43A}\u{1F98C}</div>
 <h2>Našli sme ich!</h2>
 <p id="finMsg"></p>
 <button class="btn btn-b" id="finBtn">Hurááá!</button>
@@ -564,6 +564,10 @@ function startLevel(wi,li){
 }
 
 $('storyGo').addEventListener('click',()=>{
+  // Init audio context from user gesture (needed for TTS on tablets)
+  try{ga();if(actx&&actx.state==='suspended')actx.resume();}catch(e){}
+  if('speechSynthesis' in window){speechSynthesis.cancel();initV();}
+
   const w=WORLDS[curW];
   const lvs=w.levels.filter(l=>typeof l!=='string');
   const lv=lvs[curL];
@@ -639,7 +643,10 @@ function loadRound(){
 
 function lPic(){$('gLabel').textContent='\u{1F5BC} Obrázok';$('gTitle').textContent='Čo je na obrázku?';$('gInstr').textContent='Napíš slovo.';$('picE').textContent=cur.data.e;$('cPic').style.display='block';tgt=cur.data.w;typed=[];uTD('picTD',tgt,typed);sInp('picIn','picTD');}
 function lMt(){$('gLabel').textContent='\u{1F522} Matematika';$('gTitle').textContent='Vypočítaj!';$('gInstr').textContent='Vyber správne číslo.';$('mathD').innerHTML=cur.data.display;$('cMath').style.display='block';let att=0;const c=$('mathO');c.innerHTML='';cur.data.options.forEach(o=>{const b=document.createElement('button');b.className='mob';b.textContent=o;b.addEventListener('click',()=>{ps('cl');if(ans)return;if(o===cur.data.answer){b.classList.add('ok');onOk();}else{b.classList.add('no');b.disabled=true;att++;if(att>=2)onBad();else onWF();}});c.appendChild(b);});}
-function lDi(){$('gLabel').textContent='\u{1F509} Diktát';$('gTitle').textContent='Napíš, čo počuješ';$('gInstr').textContent='Stlač reproduktor.';$('dictH').textContent=cur.data.word.length+' písmen';$('cDict').style.display='block';tgt=cur.data.word;typed=[];uTD('dictTD',tgt,typed);sInp('dictIn','dictTD');setTimeout(()=>spk(cur.data.word),300);}
+function lDi(){$('gLabel').textContent='\u{1F509} Diktát';$('gTitle').textContent='Napíš, čo počuješ';$('gInstr').textContent='Stlač reproduktor a napíš slovo.';$('dictH').textContent='Nápoveda: '+cur.data.word.length+' písmen';$('cDict').style.display='block';tgt=cur.data.word;typed=[];uTD('dictTD',tgt,typed);sInp('dictIn','dictTD');
+// Auto-play only works from user gesture - spkBtn click handles it
+// Try auto-play but it may be blocked on tablet
+try{spk(cur.data.word);}catch(e){}}
 function lSy(){const d=cur.data;$('gLabel').textContent='\u{1F9E9} Slabiky';$('gTitle').textContent='Poskladaj slovo!';$('gInstr').textContent='Ťukaj na slabiky správne.';$('sylE').textContent=d.e;$('sylT').textContent='_'.repeat(d.w.length);$('cSyl').style.display='block';let built=[],err=0;const extra=pk(SYL.filter(x=>x.w!==d.w),1).flatMap(x=>x.s.slice(0,1));const all=sh([...d.s,...extra]);const c=$('sylO');c.innerHTML='';all.forEach(syl=>{const b=document.createElement('button');b.className='syb';b.textContent=syl;b.addEventListener('click',()=>{ps('cl');if(ans)return;if(syl===d.s[built.length]){built.push(syl);b.classList.add('used');$('sylT').textContent=built.join('')+'_'.repeat(d.w.length-built.join('').length);if(built.length===d.s.length)onOk();}else{b.classList.add('wf');err++;if(err>=2)onBad();else onWF();setTimeout(()=>b.classList.remove('wf'),400);}});c.appendChild(b);});}
 function lMa(){$('gLabel').textContent='\u{1F517} Spájanie';$('gTitle').textContent='Spoj obrázok so slovom';$('gInstr').textContent='Ťukni obrázok, potom slovo.';$('cMatch').style.display='block';const pairs=cur.data.pairs;const emojis=sh([...pairs]),words=sh([...pairs]);let sel=null,matched=0;const g=$('matchG');g.innerHTML='';emojis.forEach((p,i)=>{const el=document.createElement('div');el.className='mi emo';el.textContent=p.emoji;el.dataset.word=p.word;el.dataset.type='e';el.addEventListener('click',()=>hMC(el));g.appendChild(el);const w=document.createElement('div');w.className='mi';w.textContent=words[i].word;w.dataset.word=words[i].word;w.dataset.type='w';w.addEventListener('click',()=>hMC(w));g.appendChild(w);});function hMC(el){if(ans||el.classList.contains('mtd'))return;ps('cl');if(!sel){sel=el;el.classList.add('sel');}else{if(sel.dataset.type===el.dataset.type){sel.classList.remove('sel');sel=el;el.classList.add('sel');}else{sel.classList.remove('sel');if(sel.dataset.word===el.dataset.word){sel.classList.add('mtd');el.classList.add('mtd');matched++;ps('ok');if(matched===3)setTimeout(()=>onOk(),200);}else onWF();sel=null;}}}}
 function lTF(){const d=cur.data;$('gLabel').textContent='\u{2753} Pravda/Nepravda';$('gTitle').textContent='Je to správne?';$('gInstr').textContent='Sedí slovo k obrázku?';$('tfE').textContent=d.emoji;$('tfW').textContent=d.word;$('cTF').style.display='block';const c=$('tfO');c.innerHTML='';[{l:'\u{2705}',v:true},{l:'\u{274C}',v:false}].forEach(o=>{const b=document.createElement('button');b.className='tfb';b.textContent=o.l;b.addEventListener('click',()=>{ps('cl');if(ans)return;if(o.v===d.correct){b.classList.add('ok');onOk();}else{b.classList.add('no');onBad();}});c.appendChild(b);});}
