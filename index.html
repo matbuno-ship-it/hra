@@ -39,14 +39,29 @@ nav{display:flex;align-items:center;justify-content:center;padding:12px 16px;gap
 @keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
 
 /* INTRO SLIDES */
-.intro-slide{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:24px;text-align:center;max-width:420px;margin:0 auto}
-.intro-slide .intro-emoji{font-size:100px;margin-bottom:20px;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
-.intro-slide .intro-img{width:140px;margin-bottom:16px;filter:drop-shadow(0 6px 16px rgba(61,45,121,.12));animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
-.intro-slide h2{font-size:28px;font-weight:900;color:var(--purple);margin-bottom:10px;line-height:1.2}
-.intro-slide p{font-size:18px;line-height:1.5;color:var(--text);margin-bottom:24px}
-.intro-dots{display:flex;gap:8px;margin-bottom:20px}
-.intro-dot{width:10px;height:10px;border-radius:50%;background:var(--plight)}
-.intro-dot.active{background:var(--purple);transform:scale(1.2)}
+.intro-slide{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:20px;text-align:center;max-width:480px;margin:0 auto}
+.intro-slide .intro-emoji{font-size:120px;margin-bottom:24px;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.intro-slide .intro-img{width:160px;margin-bottom:20px;filter:drop-shadow(0 8px 20px rgba(61,45,121,.15));animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.intro-slide h2{font-size:36px;font-weight:900;color:var(--purple);margin-bottom:14px;line-height:1.15}
+.intro-slide p{font-size:22px;line-height:1.55;color:var(--text);margin-bottom:28px}
+.intro-slide p .s1{color:var(--purple);font-weight:800}
+.intro-slide p .s2{color:var(--pink);font-weight:800}
+.intro-slide p .s3{color:var(--forest);font-weight:800}
+.intro-dots{display:flex;gap:10px;margin-bottom:24px}
+.intro-dot{width:12px;height:12px;border-radius:50%;background:var(--plight);transition:all .2s}
+.intro-dot.active{background:var(--purple);transform:scale(1.3)}
+
+@media(max-width:768px){
+  .intro-slide h2{font-size:30px}
+  .intro-slide p{font-size:20px}
+  .intro-slide .intro-img{width:130px}
+  .intro-slide .intro-emoji{font-size:90px}
+}
+@media(max-width:400px){
+  .intro-slide h2{font-size:26px}
+  .intro-slide p{font-size:18px}
+  .intro-slide .intro-img{width:110px}
+}
 
 /* WORLD CARDS (namiesto tabs) */
 .world-cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px;margin-bottom:16px}
@@ -201,7 +216,7 @@ nav{display:flex;align-items:center;justify-content:center;padding:12px 16px;gap
 .skb:hover{opacity:.7}
 .btn{border:none;border-radius:100px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:transform .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:hover{transform:scale(1.03)}.btn:active{transform:scale(.97)}
-.btn-b{background:var(--purple);color:var(--white);padding:14px 40px;font-size:19px}
+.btn-b{background:var(--purple);color:var(--white);padding:18px 48px;font-size:22px;border-radius:100px}
 .btn-m{background:var(--purple);color:var(--white);padding:10px 24px;font-size:16px}
 
 .pw{width:100%;max-width:600px;margin-bottom:10px}
@@ -227,7 +242,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 </div>
 <div class="wrap">
 <nav>
-<img src="lili-icon.svg" alt="" style="width:32px;height:32px"> <span class="logo">Sárkina Hra</span>
+<span class="logo">Sárkina Hra</span>
 <div class="streak" id="stk" style="display:none"></div>
 <div class="score-pill" id="scr" style="display:none">&#11088; <span id="scrV">0</span></div>
 </nav>
@@ -241,7 +256,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 
 <!-- WORLD SELECT -->
 <div class="screen" id="mapScr">
-<div class="mc" id="mapMC"><img src="2.png" alt="Lili" class=""><div class="bub"><span class="nm">Lili</span><span id="mapMsg">Vyber si svet, Sárka!</span></div></div>
+<div class="mc" id="mapMC"><img src="2.png" alt="Stella" class=""><div class="bub"><span class="nm">Stella</span><span id="mapMsg">Vyber si svet, Sárka!</span></div></div>
 <div class="world-cards" id="worldCards"></div>
 </div>
 
@@ -256,7 +271,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 
 <!-- STORY (príbehový moment pred levelom) -->
 <div class="screen" id="storyScr">
-<div class="mc" id="storyMC"><img src="2.png" id="storyImg" alt="" class=""><div class="bub"><span class="nm" id="storyNm">Lili</span><span id="storyMsg"></span></div></div>
+<div class="mc" id="storyMC"><img src="2.png" id="storyImg" alt="" class=""><div class="bub"><span class="nm" id="storyNm">Stella</span><span id="storyMsg"></span></div></div>
 <button class="btn btn-b" id="storyGo">Poďme!</button>
 </div>
 
@@ -287,7 +302,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 
 <!-- RESULT -->
 <div class="screen result" id="resScr">
-<div class="mc"><img src="2.png" id="resImg" alt="" class=""><div class="bub"><span class="nm" id="resNm">Lili</span><span id="resMsg"></span></div></div>
+<div class="mc"><img src="2.png" id="resImg" alt="" class=""><div class="bub"><span class="nm" id="resNm">Stella</span><span id="resMsg"></span></div></div>
 <div class="stars" id="resStars"></div>
 <p id="resTxt"></p>
 <button class="btn btn-b" id="resBack">Späť na mapu</button>
@@ -318,7 +333,7 @@ const OSENT=[{w:['Pes','sedí','doma.'],c:'Pes sedí doma.'},{w:['Mačka','pije'
 
 // WORLDS
 const WORLDS=[
-{name:'Čarovný les',icon:'\u{1F332}',color:'w0',mascot:'2.png',mascotName:'Lili',
+{name:'Čarovný les',icon:'\u{1F332}',color:'w0',mascot:'2.png',mascotName:'Stella',
  mapIcons:['\u{1F332}\u{1F333}','\u{1F344}\u{1F33F}','\u{1F30A}\u{1F332}'],
  levels:[
   {name:'Stopy v lese',types:['picture_easy','trueFalse'],story:'Sárka, Lukáš sa stratil v lese! Pomôžeš mi ho hľadať?'},
@@ -328,10 +343,10 @@ const WORLDS=[
   {name:'Potok',types:['dictation_easy','picture_medium'],story:'Obojok viedol k potoku... počujem niečo!'},
   '_chest|Stopy vedú z lesa von! K rieke!|\u{1F9E3}|Útržok mapy potoka a kúsok obojku',
   {name:'Koniec lesa',types:['readSentence','fillWord'],story:'Na konci lesa vidím rieku! Ale Lukáš tu nie je...'},
-  '_chest|Mapa ukazuje, že prešiel cez rieku! Moli, tvoja Nella bola s ním!|\u{1F5FA}|Celá mapa lesa!',
+  '_chest|Mapa ukazuje, že prešiel cez rieku! Lili, tvoja Nella bola s ním!|\u{1F5FA}|Celá mapa lesa!',
  ]
 },
-{name:'Modrá rieka',icon:'\u{1F30A}',color:'w1',mascot:'1.png',mascotName:'Moli',
+{name:'Modrá rieka',icon:'\u{1F30A}',color:'w1',mascot:'1.png',mascotName:'Lili',
  mapIcons:['\u{1F30A}\u{1FAA8}','\u{1F3DE}\u{FE0F}\u{1F490}','\u{26F0}\u{FE0F}\u{1F30A}'],
  levels:[
   {name:'Kopýtka',types:['readSentence','orderWords'],story:'Tu pri rieke vidím malé kopýtka! Nella tu bola!'},
@@ -341,10 +356,10 @@ const WORLDS=[
   {name:'Značka',types:['dictation_hard','picture_hard'],story:'Lukáš nechal značku na strome. Sú šikovní!'},
   '_chest|Stopy sa otáčajú... idú k horám!|\u{1F380}|Stužka a značka na strome',
   {name:'K horám',types:['fillWord','match'],story:'Vidím hory! A tam hore... niečo sa hýbe!'},
-  '_chest|Mapa je celá! Sú v horách! Lili, poďme spolu!|\u{1F5FA}|Celá mapa rieky!',
+  '_chest|Mapa je celá! Sú v horách! Stella, poďme spolu!|\u{1F5FA}|Celá mapa rieky!',
  ]
 },
-{name:'Zlaté hory',icon:'\u{26F0}\u{FE0F}',color:'w2',mascot:'2.png',mascotName:'Lili a Moli',
+{name:'Zlaté hory',icon:'\u{26F0}\u{FE0F}',color:'w2',mascot:'2.png',mascotName:'Stella a Lili',
  mapIcons:['\u{26F0}\u{FE0F}\u{1F343}','\u{1F525}\u{1FA78}','\u{1F3D4}\u{FE0F}\u{2728}'],
  levels:[
   {name:'Dupot',types:['_mix_easy'],story:'Počúvaj... počujem štebot a dupot kopýtok!'},
@@ -388,39 +403,44 @@ function acf(){cx.clearRect(0,0,cc.width,cc.height);cp.forEach(p=>{p.x+=p.vx;p.y
 
 // TTS
 let skV=null;
-function initV(){if(!('speechSynthesis' in window))return;const v=speechSynthesis.getVoices();skV=v.find(x=>x.lang==='sk-SK'&&x.name.includes('Microsoft'))||v.find(x=>x.lang==='sk-SK')||v.find(x=>x.lang.startsWith('sk'))||v.find(x=>x.lang.startsWith('cs'))||null;}
-if('speechSynthesis' in window){initV();speechSynthesis.onvoiceschanged=initV;}
-function spk(text){
-  const w=text.toLowerCase(),btn=$('spkBtn');
-  if(btn)btn.classList.add('playing');
-  // Try Google TTS first
-  const url='https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=sk&client=gtx&q='+encodeURIComponent(w);
-  const a=new Audio(url);
-  let played=false;
-  a.oncanplaythrough=()=>{if(!played){played=true;a.play().catch(()=>spkFB(text));}};
-  a.onended=()=>{
-    setTimeout(()=>{
-      const a2=new Audio(url);
-      a2.onended=()=>{if(btn)btn.classList.remove('playing');};
-      a2.onerror=()=>{if(btn)btn.classList.remove('playing');};
-      a2.play().catch(()=>{if(btn)btn.classList.remove('playing');});
-    },400);
-  };
-  a.onerror=()=>spkFB(text);
-  // Timeout fallback – if nothing plays in 3s, use speech synthesis
-  setTimeout(()=>{if(!played){played=true;spkFB(text);}},3000);
+function initV(){
+  if(!('speechSynthesis' in window))return;
+  const v=speechSynthesis.getVoices();
+  if(!v.length)return;
+  skV=v.find(x=>x.lang==='sk-SK'&&/microsoft|google/i.test(x.name))
+    ||v.find(x=>x.lang==='sk-SK')
+    ||v.find(x=>x.lang&&x.lang.startsWith('sk'))
+    ||v.find(x=>x.lang==='cs-CZ')
+    ||v.find(x=>x.lang&&x.lang.startsWith('cs'))
+    ||null;
+  console.log('TTS hlas:',skV?skV.name+' ['+skV.lang+']':'žiadny');
 }
-function spkFB(text){
+if('speechSynthesis' in window){initV();speechSynthesis.onvoiceschanged=initV;}
+
+function spk(text){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
   const btn=$('spkBtn');
-  if(!('speechSynthesis' in window)){if(btn)btn.classList.remove('playing');return;}
-  speechSynthesis.cancel();
   if(btn)btn.classList.add('playing');
-  const u=new SpeechSynthesisUtterance(text.toLowerCase());
-  if(skV){u.voice=skV;u.lang=skV.lang;}else u.lang='sk-SK';
-  u.rate=.6;u.pitch=1.05;
-  u.onend=()=>{if(btn)btn.classList.remove('playing');};
-  u.onerror=()=>{if(btn)btn.classList.remove('playing');};
-  speechSynthesis.speak(u);
+  const w=text.toLowerCase();
+
+  const u1=new SpeechSynthesisUtterance(w);
+  if(skV){u1.voice=skV;u1.lang=skV.lang;}else{u1.lang='sk-SK';}
+  u1.rate=0.65;u1.pitch=1.05;u1.volume=1;
+
+  u1.onend=()=>{
+    // Zopakuj pomalšie
+    setTimeout(()=>{
+      const u2=new SpeechSynthesisUtterance(w);
+      if(skV){u2.voice=skV;u2.lang=skV.lang;}else{u2.lang='sk-SK';}
+      u2.rate=0.5;u2.pitch=1.05;u2.volume=1;
+      u2.onend=()=>{if(btn)btn.classList.remove('playing');};
+      u2.onerror=()=>{if(btn)btn.classList.remove('playing');};
+      window.speechSynthesis.speak(u2);
+    },500);
+  };
+  u1.onerror=()=>{if(btn)btn.classList.remove('playing');};
+  window.speechSynthesis.speak(u1);
 }
 
 // ============================================================
@@ -433,7 +453,7 @@ function renderWorldDetail(worldIdx){
   const w=WORLDS[worldIdx];
   $('wTitle').textContent=w.icon+' '+w.name;
   $('wTitle').style.color=worldIdx===0?'#2d6a4f':worldIdx===1?'#1d3557':'#b08968';
-  $('wSub').textContent=worldIdx===0?'Lili hľadá vlčiatko Lukáša':worldIdx===1?'Moli hľadá srnčiatko Nellu':'Lili a Moli spoja sily!';
+  $('wSub').textContent=worldIdx===0?'Stella hľadá vlčiatko Lukáša':worldIdx===1?'Lili hľadá srnčiatko Nellu':'Stella a Lili spoja sily!';
 
   // Map pieces
   const mp=$('mapPcs');mp.innerHTML='';
@@ -520,7 +540,7 @@ function openChest(wi,ci,parts){
 
 function showFinale(){
   ss('finScr');
-  $('finMsg').innerHTML='Lukáš a Nella čakali na kopci pri ohníku.<br><br>Lili: "Lukáš! Konečne!"<br>Moli: "Nella, moja malá!"<br><br>Nella: "Mama, my sme sa nestratili! My sme vám hľadali poklad!"<br><br><strong>Ďakujeme, Sárka! Bez teba by sme ich nenašli!</strong>';
+  $('finMsg').innerHTML='Lukáš a Nella čakali na kopci pri ohníku.<br><br>Stella: "Lukáš! Konečne!"<br>Lili: "Nella, moja malá!"<br><br>Nella: "Mama, my sme sa nestratili! My sme vám hľadali poklad!"<br><br><strong>Ďakujeme, Sárka! Bez teba by sme ich nenašli!</strong>';
   conf();ps('win');
 }
 $('finBtn').addEventListener('click',()=>{ss('mapScr');renderWorldSelect();});
@@ -663,10 +683,10 @@ $('resBack').addEventListener('click',()=>{ss('worldScr');renderWorldDetail(curW
 // INTRO SLIDES
 // ============================================================
 const INTRO_SLIDES=[
-  {emoji:'',img:'2.png',title:'Ahoj, Sárka!',text:'Ja som vlčica Lili a toto je moja kamarátka srnka Moli.',img2:'1.png'},
-  {emoji:'\u{1F43A}\u{1F98C}',title:'Naše mláďatká',text:'Moje vlčiatko Lukáš a Molina srnka Nella sa spolu hrali v lese...'},
-  {emoji:'\u{1F332}\u{2753}',title:'A stratili sa!',text:'Nevieme kde sú! Pomôžeš nám ich nájsť? Čakajú nás tri svety plné úloh.'},
-  {emoji:'\u{1F5FA}\u{FE0F}',title:'Zbieraj mapu!',text:'Za každú truhlicu nájdeš kúsok mapy. Keď poskladáš mapu, nájdeš cestu k mláďatkám!'},
+  {emoji:'',img:'2.png',title:'Ahoj, Sárka!',text:'Ja som <span class="s1">vlči</span><span class="s2">ca</span> <span class="s1">Stel</span><span class="s2">la</span> a toto je moja <span class="s1">ka</span><span class="s2">ma</span><span class="s1">rát</span><span class="s2">ka</span> <span class="s1">srn</span><span class="s2">ka</span> <span class="s1">Li</span><span class="s2">li</span>.',img2:'1.png'},
+  {emoji:'\u{1F43A}\u{1F98C}',title:'Naše mláďatká',text:'Moje <span class="s1">vlčiat</span><span class="s2">ko</span> <span class="s1">Lu</span><span class="s2">káš</span> a <span class="s1">Li</span><span class="s2">li</span><span class="s1">ne</span> <span class="s1">srn</span><span class="s2">čiat</span><span class="s1">ko</span> <span class="s1">Nel</span><span class="s2">la</span> sa spolu <span class="s1">hra</span><span class="s2">li</span> v <span class="s1">le</span><span class="s2">se</span>...'},
+  {emoji:'\u{1F332}\u{2753}',title:'A stratili sa!',text:'<span class="s1">Ne</span><span class="s2">vie</span><span class="s1">me</span> kde sú! <span class="s1">Po</span><span class="s2">mô</span><span class="s1">žeš</span> nám ich <span class="s2">nájsť</span>? <span class="s1">Ča</span><span class="s2">ka</span><span class="s1">jú</span> nás tri <span class="s2">sve</span><span class="s1">ty</span> plné <span class="s2">ú</span><span class="s1">loh</span>.'},
+  {emoji:'\u{1F5FA}\u{FE0F}',title:'Zbieraj mapu!',text:'Za <span class="s1">kaž</span><span class="s2">dú</span> <span class="s1">truh</span><span class="s2">li</span><span class="s1">cu</span> <span class="s2">náj</span><span class="s1">deš</span> <span class="s2">kú</span><span class="s1">sok</span> <span class="s2">ma</span><span class="s1">py</span>. Keď ju <span class="s1">po</span><span class="s2">skla</span><span class="s1">dáš</span>, <span class="s2">náj</span><span class="s1">deš</span> <span class="s2">ces</span><span class="s1">tu</span> k <span class="s2">mlá</span><span class="s1">ďat</span><span class="s2">kám</span>!'},
 ];
 let introIdx=0;
 function showIntro(){
