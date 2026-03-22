@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <defs>
+    <linearGradient id="sky-m" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe0b2"/>
+      <stop offset="60%" stop-color="#ffcc80"/>
+      <stop offset="100%" stop-color="#8d6e63"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#sky-m)"/>
+
+  <!-- Mountain range background -->
+  <polygon points="0,120 40,60 80,100 120,40 180,90 200,50 260,85 300,30 340,70 380,45 400,80 400,200 0,200" fill="#8d6e63" opacity=".3"/>
+
+  <!-- PART 1: Mountain path start + fresh tracks -->
+  <g class="map-part" data-part="0">
+    <!-- Mountain -->
+    <polygon points="0,160 50,70 100,160" fill="#a1887f"/>
+    <polygon points="0,160 50,80 80,160" fill="#8d6e63"/>
+    <!-- Snow -->
+    <polygon points="45,78 50,70 55,78" fill="white"/>
+    <!-- Path winding up -->
+    <path d="M10,185 Q30,170 50,175 Q70,180 90,168" stroke="#6d4c41" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Fresh pawprints (two pairs!) -->
+    <circle cx="40" cy="174" r="2" fill="#4e342e"/>
+    <circle cx="45" cy="172" r="1.8" fill="#4e342e"/>
+    <circle cx="55" cy="176" r="2" fill="#4e342e"/>
+    <circle cx="60" cy="174" r="1.8" fill="#4e342e"/>
+    <!-- Small flowers -->
+    <circle cx="25" cy="178" r="2.5" fill="#ce93d8"/>
+    <circle cx="75" cy="172" r="2" fill="#f48fb1"/>
+    <!-- Pine tree -->
+    <polygon points="80,165 90,130 100,165" fill="#2d6a4f"/>
+    <rect x="88" y="165" width="4" height="8" fill="#5d4037"/>
+  </g>
+
+  <!-- PART 2: Rocky pass + eagle -->
+  <g class="map-part" data-part="1">
+    <!-- Big rocks -->
+    <polygon points="120,170 140,110 160,170" fill="#78909c"/>
+    <polygon points="130,170 145,120 165,170" fill="#90a4ae"/>
+    <!-- Cave entrance -->
+    <ellipse cx="150" cy="160" rx="15" ry="12" fill="#455a64"/>
+    <ellipse cx="150" cy="158" rx="12" ry="9" fill="#37474f"/>
+    <!-- Eagle in sky -->
+    <path d="M160,50 Q165,45 170,50 Q175,45 180,50" stroke="#5d4037" stroke-width="2" fill="none"/>
+    <path d="M130,65 Q135,60 140,65 Q145,60 150,65" stroke="#5d4037" stroke-width="1.5" fill="none"/>
+    <!-- Path continues -->
+    <path d="M90,168 Q120,155 160,162" stroke="#6d4c41" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Berries on bush -->
+    <ellipse cx="120" cy="168" rx="10" ry="6" fill="#2d6a4f"/>
+    <circle cx="116" cy="166" r="2" fill="#e57373"/>
+    <circle cx="122" cy="165" r="2" fill="#e57373"/>
+    <circle cx="119" cy="169" r="2" fill="#e57373"/>
+  </g>
+
+  <!-- PART 3: Campfire glow + near the top -->
+  <g class="map-part" data-part="2">
+    <!-- Mountain peak -->
+    <polygon points="200,160 240,60 280,160" fill="#a1887f"/>
+    <polygon points="210,160 240,70 270,160" fill="#8d6e63"/>
+    <!-- Snow on peak -->
+    <polygon points="235,68 240,60 245,68 242,72 238,72" fill="white"/>
+    <!-- Campfire glow -->
+    <circle cx="250" cy="145" r="20" fill="#ff9800" opacity=".15"/>
+    <circle cx="250" cy="145" r="12" fill="#ff9800" opacity=".2"/>
+    <!-- Campfire -->
+    <path d="M245,152 L248,140 L250,148 L252,138 L255,152" fill="#ff5722"/>
+    <path d="M247,152 L249,143 L251,150 L253,142 L254,152" fill="#ffd54f"/>
+    <!-- Logs -->
+    <line x1="242" y1="154" x2="258" y2="154" stroke="#5d4037" stroke-width="3" stroke-linecap="round"/>
+    <line x1="244" y1="156" x2="256" y2="152" stroke="#5d4037" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Path -->
+    <path d="M160,162 Q200,150 245,158" stroke="#6d4c41" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Smoke -->
+    <path d="M250,135 Q248,125 252,118 Q249,110 253,102" stroke="#bdbdbd" stroke-width="2" fill="none" opacity=".4"/>
+  </g>
+
+  <!-- PART 4: Summit + baby animals waiting! -->
+  <g class="map-part" data-part="3">
+    <!-- Summit mountain -->
+    <polygon points="300,160 345,45 390,160" fill="#a1887f"/>
+    <polygon points="310,160 345,55 380,160" fill="#8d6e63"/>
+    <!-- Snow -->
+    <polygon points="340,53 345,45 350,53 347,58 343,58" fill="white"/>
+    <!-- Sunny glow at top -->
+    <circle cx="345" cy="30" r="20" fill="#ffd54f" opacity=".3"/>
+    <circle cx="345" cy="30" r="12" fill="#ffeb3b" opacity=".4"/>
+    <!-- Stars -->
+    <text x="320" y="40" font-size="12" fill="#ffd54f" opacity=".6">&#x2B50;</text>
+    <text x="360" y="50" font-size="10" fill="#ffd54f" opacity=".5">&#x2B50;</text>
+    <text x="340" y="25" font-size="14" fill="#ffd54f" opacity=".7">&#x2B50;</text>
+    <!-- Meadow on top -->
+    <ellipse cx="345" cy="130" rx="30" ry="10" fill="#66bb6a"/>
+    <!-- Baby animals silhouettes (wolf pup + fawn) -->
+    <circle cx="335" cy="122" r="8" fill="#7b68ae"/>
+    <circle cx="335" cy="115" r="6" fill="#9b87cc"/>
+    <circle cx="355" cy="124" r="7" fill="#9b87cc"/>
+    <circle cx="355" cy="117" r="5.5" fill="#b8a5e0"/>
+    <!-- Heart -->
+    <text x="340" y="108" font-size="14" fill="#e91e63" opacity=".8">&#x2764;</text>
+    <!-- Path to summit -->
+    <path d="M245,158 Q290,148 340,135" stroke="#6d4c41" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Rainbow -->
+    <path d="M300,90 Q345,60 390,90" stroke="#e91e63" stroke-width="2" fill="none" opacity=".3"/>
+    <path d="M305,93 Q345,65 385,93" stroke="#ff9800" stroke-width="2" fill="none" opacity=".3"/>
+    <path d="M310,96 Q345,70 380,96" stroke="#ffd54f" stroke-width="2" fill="none" opacity=".3"/>
+  </g>
+</svg>

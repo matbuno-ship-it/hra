@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <defs>
+    <linearGradient id="sky-f" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c8e6c9"/>
+      <stop offset="100%" stop-color="#2d6a4f"/>
+    </linearGradient>
+    <linearGradient id="ground-f" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4caf50"/>
+      <stop offset="100%" stop-color="#1b5e20"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#sky-f)"/>
+  <!-- Ground -->
+  <ellipse cx="200" cy="220" rx="240" ry="60" fill="url(#ground-f)"/>
+
+  <!-- PART 1: Left trees + path start -->
+  <g class="map-part" data-part="0">
+    <!-- Tree 1 -->
+    <polygon points="30,160 50,80 70,160" fill="#2d6a4f"/>
+    <polygon points="35,130 50,60 65,130" fill="#388e3c"/>
+    <rect x="45" y="160" width="10" height="15" fill="#5d4037"/>
+    <!-- Tree 2 -->
+    <polygon points="70,165 90,90 110,165" fill="#1b5e20"/>
+    <polygon points="75,135 90,70 105,135" fill="#2d6a4f"/>
+    <rect x="85" y="165" width="10" height="12" fill="#5d4037"/>
+    <!-- Bush -->
+    <ellipse cx="50" cy="170" rx="20" ry="10" fill="#43a047"/>
+    <!-- Path start -->
+    <path d="M20,185 Q50,175 100,180" stroke="#8d6e63" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- Pawprint clue -->
+    <circle cx="60" cy="178" r="3" fill="#5d4037" opacity=".6"/>
+    <circle cx="70" cy="175" r="2.5" fill="#5d4037" opacity=".5"/>
+  </g>
+
+  <!-- PART 2: Middle forest + old fir tree -->
+  <g class="map-part" data-part="1">
+    <!-- Big fir (stará jedľa) -->
+    <polygon points="150,160 175,50 200,160" fill="#1b5e20"/>
+    <polygon points="155,130 175,40 195,130" fill="#2d6a4f"/>
+    <polygon points="160,100 175,30 190,100" fill="#388e3c"/>
+    <rect x="170" y="160" width="10" height="18" fill="#5d4037"/>
+    <!-- Small trees -->
+    <polygon points="120,168 135,110 150,168" fill="#388e3c"/>
+    <rect x="132" y="168" width="6" height="10" fill="#5d4037"/>
+    <!-- Mushrooms -->
+    <circle cx="140" cy="175" r="5" fill="#e57373"/>
+    <rect x="138" y="175" width="4" height="6" fill="#bcaaa4"/>
+    <!-- Path -->
+    <path d="M100,180 Q140,170 200,175" stroke="#8d6e63" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- Collar piece -->
+    <rect x="160" y="172" width="8" height="4" rx="2" fill="#7b1fa2" opacity=".7"/>
+  </g>
+
+  <!-- PART 3: Stream + bridge -->
+  <g class="map-part" data-part="2">
+    <!-- Stream -->
+    <path d="M230,40 Q240,80 235,120 Q230,160 240,190" stroke="#42a5f5" stroke-width="10" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M232,50 Q242,85 237,125 Q232,165 242,195" stroke="#90caf9" stroke-width="4" fill="none" stroke-linecap="round" opacity=".5"/>
+    <!-- Bridge -->
+    <rect x="225" y="155" width="30" height="6" rx="3" fill="#8d6e63"/>
+    <rect x="228" y="150" width="4" height="12" fill="#6d4c41"/>
+    <rect x="248" y="150" width="4" height="12" fill="#6d4c41"/>
+    <!-- Trees near stream -->
+    <polygon points="215,165 230,105 245,165" fill="#388e3c"/>
+    <rect x="227" y="165" width="6" height="10" fill="#5d4037"/>
+    <!-- Path continues -->
+    <path d="M200,175 Q220,168 260,172" stroke="#8d6e63" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- PART 4: Forest edge + view to river -->
+  <g class="map-part" data-part="3">
+    <!-- Last trees -->
+    <polygon points="280,168 295,100 310,168" fill="#2d6a4f"/>
+    <rect x="292" y="168" width="6" height="10" fill="#5d4037"/>
+    <polygon points="320,170 335,120 350,170" fill="#388e3c"/>
+    <rect x="332" y="170" width="6" height="10" fill="#5d4037"/>
+    <!-- Open area with river in distance -->
+    <path d="M340,180 Q360,175 400,185" stroke="#42a5f5" stroke-width="12" fill="none" stroke-linecap="round" opacity=".4"/>
+    <!-- Path to river -->
+    <path d="M260,172 Q300,165 370,178" stroke="#8d6e63" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- Flowers -->
+    <circle cx="300" cy="178" r="3" fill="#f48fb1"/>
+    <circle cx="310" cy="182" r="2.5" fill="#ce93d8"/>
+    <circle cx="340" cy="176" r="3" fill="#f48fb1"/>
+    <!-- Arrow sign -->
+    <rect x="355" y="158" width="3" height="20" fill="#6d4c41"/>
+    <polygon points="350,158 365,158 358,150" fill="#8d6e63"/>
+  </g>
+</svg>

@@ -83,12 +83,16 @@ nav{display:flex;align-items:center;justify-content:center;padding:12px 16px;gap
 .world-card.w2c{background:linear-gradient(135deg,#b08968,#dda15e)}
 .world-card .wc-lock{position:absolute;right:16px;font-size:24px;opacity:.6}
 
-/* Map pieces (inside world detail) */
-.map-pieces{display:flex;gap:8px;margin-bottom:16px;width:100%;max-width:400px;justify-content:center}
-.map-piece{flex:1;height:70px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.2)}
-.map-piece .fog{position:absolute;inset:0;background:rgba(100,100,100,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:24px;color:rgba(255,255,255,.5);transition:opacity .5s}
-.map-piece .fog.revealed{opacity:0;pointer-events:none}
-.w0bg{background:linear-gradient(135deg,#2d6a4f,#40916c)}.w1bg{background:linear-gradient(135deg,#1d3557,#457b9d)}.w2bg{background:linear-gradient(135deg,#b08968,#dda15e)}
+/* SVG Map */
+.map-container{width:100%;max-width:440px;margin-bottom:16px;position:relative;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.map-container img{width:100%;display:block}
+.map-fog{position:absolute;top:0;height:100%;background:rgba(80,80,80,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:opacity .8s ease;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,.4)}
+.map-fog.revealed{opacity:0;pointer-events:none}
+.map-fog:nth-child(2){left:0;width:25%}
+.map-fog:nth-child(3){left:25%;width:25%}
+.map-fog:nth-child(4){left:50%;width:25%}
+.map-fog:nth-child(5){left:75%;width:25%}
+.map-label{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--white);background:rgba(0,0,0,.35);padding:3px 10px;border-radius:100px;white-space:nowrap}
 
 .back-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:8px;color:var(--purple);-webkit-tap-highlight-color:transparent;align-self:flex-start;margin-bottom:8px}
 
@@ -265,7 +269,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:var(--text);opacity:.
 <button class="back-btn" id="backBtn">&larr; Späť</button>
 <div class="world-title" id="wTitle"></div>
 <div class="world-sub" id="wSub"></div>
-<div class="map-pieces" id="mapPcs"></div>
+<div id="mapPcs"></div>
 <div class="level-list" id="lvList"></div>
 </div>
 
@@ -333,41 +337,41 @@ const OSENT=[{w:['Pes','sedí','doma.'],c:'Pes sedí doma.'},{w:['Mačka','pije'
 
 // WORLDS
 const WORLDS=[
-{name:'Čarovný les',icon:'\u{1F332}',color:'w0',mascot:'2.png',mascotName:'Stella',
- mapIcons:['\u{1F332}\u{1F333}','\u{1F344}\u{1F33F}','\u{1F30A}\u{1F332}'],
+{name:'Čarovný les',icon:'\u{1F332}',color:'w0',mascot:'2.png',mascotName:'Stella',mapSvg:'map-forest.svg',
  levels:[
   {name:'Stopy v lese',types:['picture_easy','trueFalse'],story:'Sárka, Lukáš sa stratil v lese! Pomôžeš mi ho hľadať?'},
+  '_chest|Vidím stopy! Vedú k jedli!|\u{1F43E}|Odtlačky labiek v blate',
   {name:'Odtlačky',types:['syllable','match'],story:'Pozri, tu sú odtlačky labiek v blate!'},
-  '_chest|Vidím kam šiel! K starej jedli!|\u{1F43E}|Útržok mapy lesa a odtlačok labky',
+  '_chest|Pri jedli bol kúsok obojku!|\u{1F9E3}|Našli sme kúsok obojku',
   {name:'Obojok',types:['math_add','selectAll'],story:'Pri jedli som našla kúsok jeho obojku!'},
+  '_chest|Obojok viedol k potoku!|\u{1F30A}|Most cez potok',
   {name:'Potok',types:['dictation_easy','picture_medium'],story:'Obojok viedol k potoku... počujem niečo!'},
-  '_chest|Stopy vedú z lesa von! K rieke!|\u{1F9E3}|Útržok mapy potoka a kúsok obojku',
   {name:'Koniec lesa',types:['readSentence','fillWord'],story:'Na konci lesa vidím rieku! Ale Lukáš tu nie je...'},
-  '_chest|Mapa ukazuje, že prešiel cez rieku! Lili, tvoja Nella bola s ním!|\u{1F5FA}|Celá mapa lesa!',
+  '_chest|Prešiel cez rieku! Lili, tvoja Nella bola s ním!|\u{1F5FA}|Celá mapa lesa!',
  ]
 },
-{name:'Modrá rieka',icon:'\u{1F30A}',color:'w1',mascot:'1.png',mascotName:'Lili',
- mapIcons:['\u{1F30A}\u{1FAA8}','\u{1F3DE}\u{FE0F}\u{1F490}','\u{26F0}\u{FE0F}\u{1F30A}'],
+{name:'Modrá rieka',icon:'\u{1F30A}',color:'w1',mascot:'1.png',mascotName:'Lili',mapSvg:'map-river.svg',
  levels:[
   {name:'Kopýtka',types:['readSentence','orderWords'],story:'Tu pri rieke vidím malé kopýtka! Nella tu bola!'},
+  '_chest|Tu boli kopýtka pri rieke!|\u{1F43E}|Stopy kopýtok v blate',
   {name:'Škrabanec',types:['math_sub','compare'],story:'Na kameni je škrabanec. To Lukáš chránil Nellu!'},
-  '_chest|Šli pozdĺž rieky na sever!|\u{1FAA8}|Útržok mapy rieky a škrabanec na kameni',
+  '_chest|Na kameni sú škrabance!|\u{1FAA8}|Škrabance a šľapky na kameni',
   {name:'Stužka',types:['numline','selectAll'],story:'Tu je Nellina stužka! Zachytila sa o konárik!'},
+  '_chest|Stužka na konári!|\u{1F380}|Nellina stužka na strome',
   {name:'Značka',types:['dictation_hard','picture_hard'],story:'Lukáš nechal značku na strome. Sú šikovní!'},
-  '_chest|Stopy sa otáčajú... idú k horám!|\u{1F380}|Stužka a značka na strome',
   {name:'K horám',types:['fillWord','match'],story:'Vidím hory! A tam hore... niečo sa hýbe!'},
-  '_chest|Mapa je celá! Sú v horách! Stella, poďme spolu!|\u{1F5FA}|Celá mapa rieky!',
+  '_chest|Stopy vedú k horám! Stella, poďme!|\u{1F5FA}|Celá mapa rieky!',
  ]
 },
-{name:'Zlaté hory',icon:'\u{26F0}\u{FE0F}',color:'w2',mascot:'2.png',mascotName:'Stella a Lili',
- mapIcons:['\u{26F0}\u{FE0F}\u{1F343}','\u{1F525}\u{1FA78}','\u{1F3D4}\u{FE0F}\u{2728}'],
+{name:'Zlaté hory',icon:'\u{26F0}\u{FE0F}',color:'w2',mascot:'2.png',mascotName:'Stella a Lili',mapSvg:'map-mountain.svg',
  levels:[
   {name:'Dupot',types:['_mix_easy'],story:'Počúvaj... počujem štebot a dupot kopýtok!'},
+  '_chest|Čerstvé stopy dvoch párov!|\u{1F43E}|Stopy v snehu',
   {name:'Stopy v snehu',types:['_mix_medium'],story:'V snehu sú čerstvé stopy! Dve páry!'},
-  '_chest|Stopy sú čerstvé! Sú blízko!|\u{1F43E}\u{1F43E}|Čerstvé stopy v snehu',
+  '_chest|Vidím jaskyňu!|\u{1F985}|Skalný priesmyk',
   {name:'Táborák',types:['_mix_medium'],story:'Za kopcom vidím oheň! Asi si urobili táborák!'},
+  '_chest|Oheň! Niekto tu táboril!|\u{1F525}|Táborisko s ohníkom',
   {name:'Volanie',types:['_mix_hard'],story:'Lukáš! Nella! Ste tam?!'},
-  '_chest|Sedia pri ohni a čakajú na nás!|\u{1F525}|Jaskyňa s ohníkom',
   {name:'Posledný kúsok',types:['_mix_hard'],story:'Už ich vidíme! Ešte posledný kúsok!'},
   '_chest|FINALE|\u{2728}|Našli sme ich!',
  ]
@@ -384,10 +388,10 @@ function ss(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remo
 // STORAGE
 const SK='sarkina-v3';
 function ld(){try{return JSON.parse(localStorage.getItem(SK))||dd();}catch{return dd();}}
-function dd(){return{worlds:[{levels:[],mp:[false,false,false]},{levels:[],mp:[false,false,false]},{levels:[],mp:[false,false,false]}],done:false,streak:{c:0,d:''},stats:{g:0,t:0}};}
+function dd(){return{worlds:[{levels:[],mp:[false,false,false,false]},{levels:[],mp:[false,false,false,false]},{levels:[],mp:[false,false,false,false]}],done:false,streak:{c:0,d:''},stats:{g:0,t:0}};}
 function sv(d){localStorage.setItem(SK,JSON.stringify(d));}
 function uStreak(d){const t=new Date().toISOString().slice(0,10),y=new Date(Date.now()-864e5).toISOString().slice(0,10);if(d.streak.d===t)return;d.streak.c=d.streak.d===y?d.streak.c+1:1;d.streak.d=t;}
-function wUnlocked(d,wi){if(wi===0)return true;const prev=d.worlds[wi-1];return prev.mp[0]&&prev.mp[1]&&prev.mp[2];}
+function wUnlocked(d,wi){if(wi===0)return true;const prev=d.worlds[wi-1];return prev.mp[0]&&prev.mp[1]&&prev.mp[2]&&prev.mp[3];}
 function lvStars(d,wi,li){return d.worlds[wi]?.levels[li]?.stars||0;}
 function lvUnlocked(d,wi,li){if(!wUnlocked(d,wi))return false;if(li===0)return true;return lvStars(d,wi,li-1)>=1;}
 
@@ -455,18 +459,27 @@ function renderWorldDetail(worldIdx){
   $('wTitle').style.color=worldIdx===0?'#2d6a4f':worldIdx===1?'#1d3557':'#b08968';
   $('wSub').textContent=worldIdx===0?'Stella hľadá vlčiatko Lukáša':worldIdx===1?'Lili hľadá srnčiatko Nellu':'Stella a Lili spoja sily!';
 
-  // Map pieces
+  // SVG Map with fog
   const mp=$('mapPcs');mp.innerHTML='';
-  w.mapIcons.forEach((icon,i)=>{
-    const div=document.createElement('div');
-    div.className='map-piece '+w.color+'bg';
-    div.textContent=icon;
+  const container=document.createElement('div');
+  container.className='map-container';
+  const img=document.createElement('img');
+  img.src=w.mapSvg;img.alt=w.name;
+  container.appendChild(img);
+  const revealed=d.worlds[worldIdx].mp;
+  const total=revealed.length;
+  for(let i=0;i<total;i++){
     const fog=document.createElement('div');
-    fog.className='fog'+(d.worlds[worldIdx].mp[i]?' revealed':'');
-    fog.textContent=d.worlds[worldIdx].mp[i]?'':'?';
-    div.appendChild(fog);
-    mp.appendChild(div);
-  });
+    fog.className='map-fog'+(revealed[i]?' revealed':'');
+    fog.textContent=revealed[i]?'':'\u{2753}';
+    container.appendChild(fog);
+  }
+  const partsRevealed=revealed.filter(Boolean).length;
+  const label=document.createElement('div');
+  label.className='map-label';
+  label.textContent=`Mapa: ${partsRevealed} / ${total}`;
+  container.appendChild(label);
+  mp.appendChild(container);
 
   // Levels
   const list=$('lvList');list.innerHTML='';
