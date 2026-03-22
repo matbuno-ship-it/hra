@@ -480,15 +480,19 @@ function renderWorldDetail(worldIdx){
       const prevLvDone=levelIdx>0&&lvStars(d,worldIdx,levelIdx-1)>=1;
       const canOpen=prevLvDone&&!opened;
 
-      const wrap=document.createElement('div');
-      wrap.innerHTML='<div class="lv-line'+(prevLvDone?' done':'')+'"></div>';
+      const line1=document.createElement('div');
+      line1.className='lv-line'+(prevLvDone?' done':'');
+      list.appendChild(line1);
+
       const node=document.createElement('div');
       node.className='ch-node';
       node.innerHTML='<div class="ch-icon'+(canOpen?'':opened?'':' off')+'">'+(opened?'\u{1F381}':'\u{1F4E6}')+'</div><div class="ch-lbl">'+(opened?'Otvorená':'Truhlica')+'</div>';
       if(canOpen)node.addEventListener('click',()=>openChest(worldIdx,ci,parts));
-      wrap.appendChild(node);
-      wrap.innerHTML+='<div class="lv-line"></div>';
-      list.appendChild(wrap);
+      list.appendChild(node);
+
+      const line2=document.createElement('div');
+      line2.className='lv-line';
+      list.appendChild(line2);
       chestIdx++;
     }else{
       const li=levelIdx;
@@ -497,8 +501,7 @@ function renderWorldDetail(worldIdx){
       const done=stars>0;
       const isCur=unlocked&&!done;
 
-      const wrap=document.createElement('div');
-      if(i>0)wrap.innerHTML='<div class="lv-line'+(done?' done':'')+'"></div>';
+      if(i>0){const ln=document.createElement('div');ln.className='lv-line'+(done?' done':'');list.appendChild(ln);}
 
       const node=document.createElement('div');
       node.className='lv-node';
@@ -507,8 +510,7 @@ function renderWorldDetail(worldIdx){
       let stH='';for(let s=0;s<3;s++)stH+='<span class="'+(s<stars?'on':'off')+'">\u{2B50}</span>';
       node.innerHTML='<div class="lv-circ '+cls+'">'+inner+'</div><div class="lv-name">'+lv.name+'</div>'+(done?'<div class="lv-stars">'+stH+'</div>':'');
       if(unlocked)node.addEventListener('click',()=>startLevel(worldIdx,li));
-      wrap.appendChild(node);
-      list.appendChild(wrap);
+      list.appendChild(node);
       levelIdx++;
     }
   });
